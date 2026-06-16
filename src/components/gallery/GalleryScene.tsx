@@ -1,17 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, type MutableRefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { GalleryImage } from "@/lib/gallery/types";
+import { decayInertiaVelocity, shouldAutoplayAdvance } from "@/lib/gallery/interaction";
 import { getCircle2DAutoplayStep, getViewportMode } from "@/lib/gallery/layout";
 import { GalleryImagePlane } from "./GalleryImagePlane";
 
 type GallerySceneProps = {
+  draggingRef: MutableRefObject<boolean>;
   images: GalleryImage[];
+  progressRef: MutableRefObject<number>;
+  resumeAutoplayAtRef: MutableRefObject<number>;
+  velocityRef: MutableRefObject<number>;
 };
 
-export function GalleryScene({ images }: GallerySceneProps) {
-  const progressRef = useRef(0);
+export function GalleryScene({
+  draggingRef,
+  images,
+  progressRef,
+  resumeAutoplayAtRef,
+  velocityRef
+}: GallerySceneProps) {
   const [reducedMotion, setReducedMotion] = useState(false);
   const viewport = useThree((state) => getViewportMode(state.size.width));
 
@@ -29,10 +39,24 @@ export function GalleryScene({ images }: GallerySceneProps) {
   }, []);
 
   useFrame((_, delta) => {
-    progressRef.current += getCircle2DAutoplayStep({
-      deltaSeconds: delta,
-      reducedMotion
-    });
+    if (!draggingRef.current && velocityRef.current !== 0) {
+      progressRef.current += velocityRef.current;
+      velocityRef.current = decayInertiaVelocity(velocityRef.current);
+    }
+
+    if (
+      shouldAutoplayAdvance({
+        dragging: draggingRef.current,
+        nowMs: window.performance.now(),
+        reducedMotion,
+        resumeAtMs: resumeAutoplayAtRef.current
+      })
+    ) {
+      progressRef.current += getCircle2DAutoplayStep({
+        deltaSeconds: delta,
+        reducedMotion
+      });
+    }
   });
 
   return (

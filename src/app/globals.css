@@ -91,6 +91,13 @@ select {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.gallery-canvas-shell:active {
+  cursor: grabbing;
 }
 
 .gallery-canvas-shell canvas {

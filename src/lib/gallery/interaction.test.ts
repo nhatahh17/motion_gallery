@@ -1,0 +1,69 @@
+import { describe, expect, it } from "vitest";
+import {
+  calculateDragVelocity,
+  decayInertiaVelocity,
+  getDragProgressDelta,
+  shouldAutoplayAdvance
+} from "./interaction";
+
+describe("getDragProgressDelta", () => {
+  it("moves progress opposite to pointer travel so dragging left advances the orbit", () => {
+    expect(getDragProgressDelta({ deltaX: -40, viewport: "desktop" })).toBeCloseTo(0.152);
+    expect(getDragProgressDelta({ deltaX: 40, viewport: "desktop" })).toBeCloseTo(-0.152);
+  });
+
+  it("uses stronger mobile sensitivity for shorter touch travel", () => {
+    const desktop = Math.abs(getDragProgressDelta({ deltaX: 24, viewport: "desktop" }));
+    const mobile = Math.abs(getDragProgressDelta({ deltaX: 24, viewport: "mobile" }));
+
+    expect(mobile).toBeGreaterThan(desktop);
+  });
+});
+
+describe("calculateDragVelocity", () => {
+  it("clamps velocity so fast drags cannot create chaotic motion", () => {
+    expect(calculateDragVelocity({ progressDelta: 5, elapsedMs: 16 })).toBe(0.08);
+    expect(calculateDragVelocity({ progressDelta: -5, elapsedMs: 16 })).toBe(-0.08);
+  });
+
+  it("returns no velocity for invalid elapsed time", () => {
+    expect(calculateDragVelocity({ progressDelta: 0.3, elapsedMs: 0 })).toBe(0);
+  });
+});
+
+describe("decayInertiaVelocity", () => {
+  it("decays active inertia naturally", () => {
+    expect(decayInertiaVelocity(0.08)).toBeCloseTo(0.074);
+  });
+
+  it("stops tiny residual velocity", () => {
+    expect(decayInertiaVelocity(0.0003)).toBe(0);
+  });
+});
+
+describe("shouldAutoplayAdvance", () => {
+  it("pauses autoplay while dragging or before the resume deadline", () => {
+    expect(
+      shouldAutoplayAdvance({ dragging: true, nowMs: 2_000, resumeAtMs: 0, reducedMotion: false })
+    ).toBe(false);
+    expect(
+      shouldAutoplayAdvance({
+        dragging: false,
+        nowMs: 2_000,
+        resumeAtMs: 2_500,
+        reducedMotion: false
+      })
+    ).toBe(false);
+  });
+
+  it("allows autoplay after idle delay when motion is allowed", () => {
+    expect(
+      shouldAutoplayAdvance({
+        dragging: false,
+        nowMs: 3_000,
+        resumeAtMs: 2_500,
+        reducedMotion: false
+      })
+    ).toBe(true);
+  });
+});

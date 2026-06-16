@@ -6,13 +6,14 @@ import { DoubleSide, LinearFilter, SRGBColorSpace, TextureLoader } from "three";
 import type { Mesh, MeshBasicMaterial, Texture } from "three";
 import type { MutableRefObject } from "react";
 import type { GalleryImage } from "@/lib/gallery/types";
-import type { GalleryViewportMode } from "@/lib/gallery/layout";
-import { getCircle2DLayout } from "@/lib/gallery/layout";
+import type { GalleryLayoutMode, GalleryViewportMode } from "@/lib/gallery/layout";
+import { getGalleryLayout } from "@/lib/gallery/layout";
 import { getGalleryPlaneSize } from "@/lib/gallery/plane";
 
 type GalleryImagePlaneProps = {
   image: GalleryImage;
   index: number;
+  layoutMode: GalleryLayoutMode;
   total: number;
   progressRef: MutableRefObject<number>;
   viewport: GalleryViewportMode;
@@ -21,6 +22,7 @@ type GalleryImagePlaneProps = {
 export function GalleryImagePlane({
   image,
   index,
+  layoutMode,
   progressRef,
   total,
   viewport
@@ -33,8 +35,9 @@ export function GalleryImagePlane({
   const materialRef = useRef<MeshBasicMaterial | null>(null);
 
   useFrame(() => {
-    const placement = getCircle2DLayout({
+    const placement = getGalleryLayout({
       index,
+      layoutMode,
       total,
       progress: progressRef.current,
       viewport
@@ -42,7 +45,7 @@ export function GalleryImagePlane({
 
     if (meshRef.current) {
       meshRef.current.position.set(placement.x, placement.y, placement.z);
-      meshRef.current.rotation.set(0, 0, placement.rotationZ);
+      meshRef.current.rotation.set(0, placement.rotationY, placement.rotationZ);
       meshRef.current.scale.set(placement.scale, placement.scale, 1);
     }
 

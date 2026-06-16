@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   getCircle2DLayout,
   getCircle2DAutoplayStep,
+  getCircle3DLayout,
+  getGalleryAutoplayStep,
+  getGalleryLayout,
   type GalleryViewportMode
 } from "./layout";
 
@@ -78,5 +81,107 @@ describe("getCircle2DAutoplayStep", () => {
       0.096,
       3
     );
+  });
+});
+
+describe("getCircle3DLayout", () => {
+  it("places images around the Y axis with clear depth", () => {
+    const front = getCircle3DLayout({
+      index: 0,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+    const side = getCircle3DLayout({
+      index: 7,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+
+    expect(front.z).toBeGreaterThan(2.6);
+    expect(Math.abs(front.x)).toBeLessThan(0.01);
+    expect(Math.abs(side.x)).toBeGreaterThan(3.6);
+    expect(side.z).toBeLessThan(front.z);
+  });
+
+  it("makes front images larger and clearer than back images", () => {
+    const front = getCircle3DLayout({
+      index: 0,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+    const back = getCircle3DLayout({
+      index: 15,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+
+    expect(front.scale).toBeGreaterThan(back.scale);
+    expect(front.opacity).toBeGreaterThan(back.opacity);
+    expect(back.z).toBeLessThan(-2.6);
+  });
+
+  it("uses a calmer mobile cylinder than desktop", () => {
+    const desktop = getCircle3DLayout({
+      index: 7,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+    const mobile = getCircle3DLayout({
+      index: 7,
+      total: 30,
+      progress: 0,
+      viewport: "mobile"
+    });
+
+    expect(Math.abs(mobile.x)).toBeLessThan(Math.abs(desktop.x));
+    expect(Math.abs(mobile.z)).toBeLessThan(Math.abs(desktop.z));
+    expect(mobile.scale).toBeLessThan(desktop.scale);
+  });
+});
+
+describe("getGalleryLayout", () => {
+  it("dispatches by layout mode without changing progress semantics", () => {
+    const circle2d = getGalleryLayout({
+      index: 3,
+      layoutMode: "circle2d",
+      total: 30,
+      progress: 1.25,
+      viewport: "desktop"
+    });
+    const circle3d = getGalleryLayout({
+      index: 3,
+      layoutMode: "circle3d",
+      total: 30,
+      progress: 1.25,
+      viewport: "desktop"
+    });
+
+    expect(circle2d.layoutMode).toBe("circle2d");
+    expect(circle3d.layoutMode).toBe("circle3d");
+    expect(circle3d.x).not.toBeCloseTo(circle2d.x, 3);
+    expect(circle3d.rotationY).not.toBe(0);
+  });
+});
+
+describe("getGalleryAutoplayStep", () => {
+  it("uses slower autoplay for 3D Circle than the default 2D Circle", () => {
+    const circle2d = getGalleryAutoplayStep({
+      deltaSeconds: 1,
+      layoutMode: "circle2d",
+      reducedMotion: false
+    });
+    const circle3d = getGalleryAutoplayStep({
+      deltaSeconds: 1,
+      layoutMode: "circle3d",
+      reducedMotion: false
+    });
+
+    expect(circle3d).toBeGreaterThan(0);
+    expect(circle3d).toBeLessThan(circle2d);
   });
 });

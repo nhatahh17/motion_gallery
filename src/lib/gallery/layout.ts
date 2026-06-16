@@ -1,20 +1,33 @@
 export type GalleryViewportMode = "desktop" | "tablet" | "mobile";
+export type GalleryLayoutMode = "circle2d" | "circle3d";
 
-export type Circle2DLayoutInput = {
+type GalleryLayoutInput = {
   index: number;
   total: number;
   progress: number;
   viewport: GalleryViewportMode;
 };
 
-export type Circle2DPlacement = {
+export type Circle2DLayoutInput = GalleryLayoutInput;
+export type Circle3DLayoutInput = GalleryLayoutInput;
+
+export type GalleryPlacement = {
   x: number;
   y: number;
   z: number;
+  rotationY: number;
   rotationZ: number;
   opacity: number;
   scale: number;
+  layoutMode: GalleryLayoutMode;
+};
+
+export type Circle2DPlacement = GalleryPlacement & {
   ringIndex: number;
+};
+
+export type Circle3DPlacement = GalleryPlacement & {
+  depth: number;
 };
 
 type Circle2DRingConfig = {
@@ -49,7 +62,22 @@ const opacityBoost: Record<GalleryViewportMode, number> = {
   mobile: 0.9
 };
 
-const autoplayUnitsPerSecond = 0.096;
+const circle3DRadius: Record<GalleryViewportMode, number> = {
+  desktop: 4.15,
+  tablet: 3.35,
+  mobile: 2.55
+};
+
+const circle3DVerticalWave: Record<GalleryViewportMode, number> = {
+  desktop: 0.42,
+  tablet: 0.34,
+  mobile: 0.24
+};
+
+const autoplayUnitsPerSecond: Record<GalleryLayoutMode, number> = {
+  circle2d: 0.096,
+  circle3d: 0.069
+};
 
 export function getCircle2DLayout({
   index,
@@ -70,11 +98,52 @@ export function getCircle2DLayout({
     x,
     y,
     z,
+    rotationY: 0,
     rotationZ: Math.sin(angle) * 0.045,
+    layoutMode: "circle2d",
     opacity: ring.opacity * opacityBoost[viewport],
     scale: ring.scale * imageScale[viewport],
     ringIndex
   };
+}
+
+export function getCircle3DLayout({
+  index,
+  total,
+  progress,
+  viewport
+}: Circle3DLayoutInput): Circle3DPlacement {
+  const safeTotal = Math.max(total, 1);
+  const radius = circle3DRadius[viewport];
+  const angle = (index / safeTotal) * Math.PI * 2 + progress;
+  const x = Math.sin(angle) * radius;
+  const z = Math.cos(angle) * radius * 0.72;
+  const y = Math.sin(angle * 1.7 + index) * circle3DVerticalWave[viewport];
+  const depth = (Math.cos(angle) + 1) / 2;
+  const baseScale = 0.56 + depth * 0.5;
+
+  return {
+    x,
+    y,
+    z,
+    rotationY: angle * -0.36,
+    rotationZ: Math.sin(angle * 0.7) * 0.025,
+    layoutMode: "circle3d",
+    opacity: (0.24 + depth * 0.72) * opacityBoost[viewport],
+    scale: baseScale * imageScale[viewport],
+    depth
+  };
+}
+
+export function getGalleryLayout({
+  layoutMode,
+  ...input
+}: GalleryLayoutInput & { layoutMode: GalleryLayoutMode }): GalleryPlacement {
+  if (layoutMode === "circle3d") {
+    return getCircle3DLayout(input);
+  }
+
+  return getCircle2DLayout(input);
 }
 
 export function getCircle2DAutoplayStep({
@@ -88,7 +157,23 @@ export function getCircle2DAutoplayStep({
     return 0;
   }
 
-  return deltaSeconds * autoplayUnitsPerSecond;
+  return deltaSeconds * autoplayUnitsPerSecond.circle2d;
+}
+
+export function getGalleryAutoplayStep({
+  deltaSeconds,
+  layoutMode,
+  reducedMotion
+}: {
+  deltaSeconds: number;
+  layoutMode: GalleryLayoutMode;
+  reducedMotion: boolean;
+}) {
+  if (reducedMotion) {
+    return 0;
+  }
+
+  return deltaSeconds * autoplayUnitsPerSecond[layoutMode];
 }
 
 export function getViewportMode(width: number): GalleryViewportMode {

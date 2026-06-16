@@ -4,12 +4,17 @@ import { useEffect, useState, type MutableRefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { GalleryImage } from "@/lib/gallery/types";
 import { decayInertiaVelocity, shouldAutoplayAdvance } from "@/lib/gallery/interaction";
-import { getCircle2DAutoplayStep, getViewportMode } from "@/lib/gallery/layout";
+import {
+  getGalleryAutoplayStep,
+  getViewportMode,
+  type GalleryLayoutMode
+} from "@/lib/gallery/layout";
 import { GalleryImagePlane } from "./GalleryImagePlane";
 
 type GallerySceneProps = {
   draggingRef: MutableRefObject<boolean>;
   images: GalleryImage[];
+  layoutMode: GalleryLayoutMode;
   progressRef: MutableRefObject<number>;
   resumeAutoplayAtRef: MutableRefObject<number>;
   velocityRef: MutableRefObject<number>;
@@ -18,6 +23,7 @@ type GallerySceneProps = {
 export function GalleryScene({
   draggingRef,
   images,
+  layoutMode,
   progressRef,
   resumeAutoplayAtRef,
   velocityRef
@@ -52,8 +58,9 @@ export function GalleryScene({
         resumeAtMs: resumeAutoplayAtRef.current
       })
     ) {
-      progressRef.current += getCircle2DAutoplayStep({
+      progressRef.current += getGalleryAutoplayStep({
         deltaSeconds: delta,
+        layoutMode,
         reducedMotion
       });
     }
@@ -69,6 +76,7 @@ export function GalleryScene({
             image={image}
             index={index}
             key={image.id}
+            layoutMode={layoutMode}
             progressRef={progressRef}
             total={images.length}
             viewport={viewport}

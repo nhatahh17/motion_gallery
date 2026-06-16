@@ -84,6 +84,7 @@ select {
 }
 
 .gallery-canvas-shell {
+  position: relative;
   width: min(1180px, 100%);
   height: clamp(420px, 58vh, 680px);
   margin: 0 auto 24px;
@@ -94,6 +95,37 @@ select {
   cursor: grab;
   touch-action: none;
   user-select: none;
+}
+
+.layout-switcher {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 248, 244, 0.78);
+  backdrop-filter: blur(16px);
+}
+
+.layout-switcher-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.layout-switcher-button[aria-pressed="true"] {
+  background: rgba(16, 16, 16, 0.88);
+  color: #fff;
 }
 
 .gallery-canvas-shell:active {
@@ -216,5 +248,15 @@ select {
   .gallery-state {
     height: 58vh;
     min-height: 360px;
+  }
+
+  .layout-switcher {
+    top: 10px;
+    right: 10px;
+  }
+
+  .layout-switcher-button {
+    min-height: 30px;
+    padding: 0 10px;
   }
 }

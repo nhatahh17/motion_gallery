@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import type { GalleryImage } from "@/lib/gallery/types";
-import { getViewportMode, type GalleryViewportMode } from "@/lib/gallery/layout";
+import {
+  getViewportMode,
+  type GalleryLayoutMode,
+  type GalleryViewportMode
+} from "@/lib/gallery/layout";
 import { GalleryScene } from "./GalleryScene";
 import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
@@ -14,6 +18,7 @@ type GalleryCanvasProps = {
 
 export function GalleryCanvas({ images }: GalleryCanvasProps) {
   const dpr = useViewportDpr();
+  const [layoutMode, setLayoutMode] = useState<GalleryLayoutMode>("circle2d");
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const galleryProgress = useGalleryProgress(viewport);
 
@@ -34,6 +39,24 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
       aria-label="WebGL image gallery"
       {...galleryProgress.bind}
     >
+      <div
+        className="layout-switcher"
+        aria-label="Gallery layout"
+        onPointerDown={(event) => event.stopPropagation()}
+      >
+        {layoutOptions.map((option) => (
+          <button
+            aria-pressed={layoutMode === option.value}
+            className="layout-switcher-button"
+            key={option.value}
+            onClick={() => setLayoutMode(option.value)}
+            onPointerUp={(event) => event.stopPropagation()}
+            type="button"
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
       <Canvas
         camera={{ position: [0, 0, 7.2], fov: 42, near: 0.1, far: 100 }}
         dpr={[1, dpr]}
@@ -46,6 +69,7 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
         <GalleryScene
           draggingRef={galleryProgress.draggingRef}
           images={images}
+          layoutMode={layoutMode}
           progressRef={galleryProgress.progressRef}
           resumeAutoplayAtRef={galleryProgress.resumeAutoplayAtRef}
           velocityRef={galleryProgress.velocityRef}
@@ -54,3 +78,8 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
     </section>
   );
 }
+
+const layoutOptions: Array<{ label: string; value: GalleryLayoutMode }> = [
+  { label: "2D Circle", value: "circle2d" },
+  { label: "3D Circle", value: "circle3d" }
+];

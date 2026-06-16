@@ -2,8 +2,8 @@
 
 This file maps product behavior to proof.
 
-No product behavior has been defined or implemented yet. Do not mark a row
-implemented until tests or validation evidence exist.
+The durable matrix in `harness.db` is the operational source of truth. This
+markdown file mirrors the current implemented story rows for quick review.
 
 ## Status Values
 
@@ -19,7 +19,9 @@ implemented until tests or validation evidence exist.
 
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| TBD | Add rows when story packets are created | no | no | no | no | planned | none |
+| US-001 | App setup and JSON data loading | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke loaded JSON images. |
+| US-002 | WebGL gallery foundation | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke showed Canvas with PNG thumbnail textures. |
+| US-003 | Default 2D Circle multi-ring layout | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke showed 30 JSON images and non-blank circle canvas. |
 
 ## Evidence Rules
 

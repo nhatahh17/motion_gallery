@@ -25,7 +25,7 @@ export function GalleryDebugList() {
   return (
     <section className="debug-panel" aria-labelledby="debug-gallery-title">
       <div className="debug-panel-header">
-        <p className="debug-label">Phase 1 data proof</p>
+        <p className="debug-label">Gallery data proof</p>
         <p className="debug-count">{gallery.images.length} images loaded</p>
       </div>
       <ul className="debug-list" id="debug-gallery-title">

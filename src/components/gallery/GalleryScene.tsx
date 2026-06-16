@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import type { GalleryImage } from "@/lib/gallery/types";
+import { getCircle2DAutoplayStep, getViewportMode } from "@/lib/gallery/layout";
 import { GalleryImagePlane } from "./GalleryImagePlane";
 
 type GallerySceneProps = {
@@ -9,36 +11,43 @@ type GallerySceneProps = {
 };
 
 export function GalleryScene({ images }: GallerySceneProps) {
-  const placements = useMemo(() => {
-    const spacing = 2.25;
-    const offset = ((images.length - 1) * spacing) / 2;
+  const progressRef = useRef(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const viewport = useThree((state) => getViewportMode(state.size.width));
 
-    return images.map((image, index) => ({
-      image,
-      position: [
-        index * spacing - offset,
-        Math.sin(index * 0.9) * 0.32,
-        index * -0.08
-      ] as [number, number, number],
-      rotation: [0, (index - (images.length - 1) / 2) * -0.08, 0] as [
-        number,
-        number,
-        number
-      ]
-    }));
-  }, [images]);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function updateReducedMotion() {
+      setReducedMotion(media.matches);
+    }
+
+    updateReducedMotion();
+    media.addEventListener("change", updateReducedMotion);
+
+    return () => media.removeEventListener("change", updateReducedMotion);
+  }, []);
+
+  useFrame((_, delta) => {
+    progressRef.current += getCircle2DAutoplayStep({
+      deltaSeconds: delta,
+      reducedMotion
+    });
+  });
 
   return (
     <>
       <color attach="background" args={["#f8f8f4"]} />
       <ambientLight intensity={1} />
       <group>
-        {placements.map((placement) => (
+        {images.map((image, index) => (
           <GalleryImagePlane
-            image={placement.image}
-            key={placement.image.id}
-            position={placement.position}
-            rotation={placement.rotation}
+            image={image}
+            index={index}
+            key={image.id}
+            progressRef={progressRef}
+            total={images.length}
+            viewport={viewport}
           />
         ))}
       </group>

@@ -5,6 +5,7 @@ import {
   getCircle3DLayout,
   getGalleryAutoplayStep,
   getGalleryLayout,
+  getHorizon3DLayout,
   type GalleryViewportMode
 } from "./layout";
 
@@ -160,11 +161,79 @@ describe("getGalleryLayout", () => {
       progress: 1.25,
       viewport: "desktop"
     });
+    const horizon3d = getGalleryLayout({
+      index: 3,
+      layoutMode: "horizon3d",
+      total: 30,
+      progress: 1.25,
+      viewport: "desktop"
+    });
 
     expect(circle2d.layoutMode).toBe("circle2d");
     expect(circle3d.layoutMode).toBe("circle3d");
+    expect(horizon3d.layoutMode).toBe("horizon3d");
     expect(circle3d.x).not.toBeCloseTo(circle2d.x, 3);
     expect(circle3d.rotationY).not.toBe(0);
+    expect(horizon3d.x).not.toBeCloseTo(circle2d.x, 3);
+  });
+});
+
+describe("getHorizon3DLayout", () => {
+  it("places the active image near center with side images spread horizontally", () => {
+    const center = getHorizon3DLayout({
+      index: 0,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+    const side = getHorizon3DLayout({
+      index: 4,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+
+    expect(Math.abs(center.x)).toBeLessThan(0.01);
+    expect(center.z).toBeGreaterThan(side.z);
+    expect(Math.abs(side.x)).toBeGreaterThan(3.2);
+    expect(side.opacity).toBeLessThan(center.opacity);
+  });
+
+  it("wraps progress through image positions without changing image order", () => {
+    const initial = getHorizon3DLayout({
+      index: 2,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+    const advanced = getHorizon3DLayout({
+      index: 2,
+      total: 30,
+      progress: 1,
+      viewport: "desktop"
+    });
+
+    expect(advanced.x).not.toBeCloseTo(initial.x, 5);
+    expect(advanced.layoutMode).toBe(initial.layoutMode);
+  });
+
+  it("uses a compact mobile runway", () => {
+    const desktop = getHorizon3DLayout({
+      index: 4,
+      total: 30,
+      progress: 0,
+      viewport: "desktop"
+    });
+    const mobile = getHorizon3DLayout({
+      index: 4,
+      total: 30,
+      progress: 0,
+      viewport: "mobile"
+    });
+
+    expect(Math.abs(mobile.x)).toBeLessThan(Math.abs(desktop.x));
+    expect(Math.abs(mobile.z)).toBeLessThan(Math.abs(desktop.z));
+    expect(mobile.scale).toBeLessThan(desktop.scale);
   });
 });
 
@@ -183,5 +252,21 @@ describe("getGalleryAutoplayStep", () => {
 
     expect(circle3d).toBeGreaterThan(0);
     expect(circle3d).toBeLessThan(circle2d);
+  });
+
+  it("uses the calmest autoplay for 3D Horizon", () => {
+    const circle3d = getGalleryAutoplayStep({
+      deltaSeconds: 1,
+      layoutMode: "circle3d",
+      reducedMotion: false
+    });
+    const horizon3d = getGalleryAutoplayStep({
+      deltaSeconds: 1,
+      layoutMode: "horizon3d",
+      reducedMotion: false
+    });
+
+    expect(horizon3d).toBeGreaterThan(0);
+    expect(horizon3d).toBeLessThan(circle3d);
   });
 });

@@ -81,5 +81,6 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
 
 const layoutOptions: Array<{ label: string; value: GalleryLayoutMode }> = [
   { label: "2D Circle", value: "circle2d" },
-  { label: "3D Circle", value: "circle3d" }
+  { label: "3D Circle", value: "circle3d" },
+  { label: "3D Horizon", value: "horizon3d" }
 ];

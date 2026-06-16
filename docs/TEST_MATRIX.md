@@ -24,6 +24,7 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-003 | Default 2D Circle multi-ring layout | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke showed 30 JSON images and non-blank circle canvas. |
 | US-004 | Drag touch and inertia | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright drag smoke changed shell screenshot hash and mobile shell had `touch-action: none`. |
 | US-005 | 3D Circle layout and switcher | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke switched to `3D Circle`, showed active state, rendered canvas, and 0 console errors. |
+| US-006 | 3D Horizon layout and three-mode switcher | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke switched to `3D Horizon`, showed active state, rendered canvas, and 0 console errors. |
 
 ## Evidence Rules
 

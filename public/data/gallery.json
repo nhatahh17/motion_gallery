@@ -1,8 +1,8 @@
 [
   {
     "id": "photo-001",
-    "src": "/images/gallery/photo-001.webp",
-    "thumbSrc": "/images/gallery/thumbs/photo-001.webp",
+    "src": "/images/gallery/photo-001.png",
+    "thumbSrc": "/images/gallery/thumbs/photo-001.png",
     "alt": "A quiet street in Tokyo after rain",
     "title": "After Rain",
     "location": "Tokyo, Japan",
@@ -18,8 +18,8 @@
   },
   {
     "id": "photo-002",
-    "src": "/images/gallery/photo-002.webp",
-    "thumbSrc": "/images/gallery/thumbs/photo-002.webp",
+    "src": "/images/gallery/photo-002.png",
+    "thumbSrc": "/images/gallery/thumbs/photo-002.png",
     "alt": "Soft morning light across a cafe window",
     "title": "Morning Glass",
     "location": "Da Lat, Vietnam",
@@ -32,8 +32,8 @@
   },
   {
     "id": "photo-003",
-    "src": "/images/gallery/photo-003.webp",
-    "thumbSrc": "/images/gallery/thumbs/photo-003.webp",
+    "src": "/images/gallery/photo-003.png",
+    "thumbSrc": "/images/gallery/thumbs/photo-003.png",
     "alt": "A square crop of concrete stairs and shadow",
     "title": "Concrete Quiet",
     "location": "Seoul, South Korea",

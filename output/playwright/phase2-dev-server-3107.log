@@ -1,0 +1,28 @@
+
+> motion-gallery@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3107
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://127.0.0.1:3107
+- Network:       http://127.0.0.1:3107
+✓ Ready in 1001ms
+
+ GET / 200 in 1095ms (next.js: 503ms, application-code: 592ms)
+ GET / 200 in 106ms (next.js: 16ms, application-code: 90ms)
+ GET / 200 in 417ms (next.js: 13ms, application-code: 404ms)
+ GET / 200 in 337ms (next.js: 33ms, application-code: 303ms)
+ GET / 200 in 145ms (next.js: 27ms, application-code: 118ms)
+ GET / 200 in 81ms (next.js: 6ms, application-code: 75ms)
+✓ Compiled in 494ms
+ GET / 200 in 762ms (next.js: 216ms, application-code: 546ms)
+ GET / 200 in 752ms (next.js: 352ms, application-code: 400ms)
+ GET / 200 in 321ms (next.js: 19ms, application-code: 301ms)
+ GET / 200 in 320ms (next.js: 72ms, application-code: 248ms)
+ GET / 200 in 163ms (next.js: 12ms, application-code: 152ms)
+ GET / 200 in 166ms (next.js: 69ms, application-code: 97ms)
+✓ Compiled in 47ms
+ GET / 200 in 475ms (next.js: 187ms, application-code: 288ms)
+ GET / 200 in 482ms (next.js: 329ms, application-code: 153ms)
+ GET / 200 in 425ms (next.js: 9ms, application-code: 417ms)
+ GET / 200 in 237ms (next.js: 12ms, application-code: 225ms)
+[?25h

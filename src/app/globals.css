@@ -60,7 +60,7 @@ select {
 
 .intro-section {
   display: grid;
-  min-height: 34vh;
+  min-height: 24vh;
   place-items: center;
   text-align: center;
 }
@@ -81,6 +81,38 @@ select {
   color: var(--muted);
   font-size: 16px;
   line-height: 1.6;
+}
+
+.gallery-canvas-shell {
+  width: min(1180px, 100%);
+  height: clamp(420px, 58vh, 680px);
+  margin: 0 auto 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.gallery-canvas-shell canvas {
+  display: block;
+}
+
+.gallery-state {
+  display: grid;
+  width: min(1180px, 100%);
+  min-height: 420px;
+  margin: 0 auto 24px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.gallery-state p {
+  margin: 0;
+  font-size: 13px;
+  text-transform: uppercase;
 }
 
 .debug-panel {
@@ -165,11 +197,17 @@ select {
   }
 
   .intro-section {
-    min-height: 30vh;
+    min-height: 28vh;
     text-align: left;
   }
 
   .intro-section h1 {
     font-size: 44px;
+  }
+
+  .gallery-canvas-shell,
+  .gallery-state {
+    height: 58vh;
+    min-height: 360px;
   }
 }

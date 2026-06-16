@@ -1,0 +1,47 @@
+[
+  {
+    "id": "photo-001",
+    "src": "/images/gallery/photo-001.webp",
+    "thumbSrc": "/images/gallery/thumbs/photo-001.webp",
+    "alt": "A quiet street in Tokyo after rain",
+    "title": "After Rain",
+    "location": "Tokyo, Japan",
+    "year": "2026",
+    "category": "Street",
+    "date": "2026-04-12",
+    "camera": "Sony A6400",
+    "lens": "Sigma 18-50mm",
+    "ratio": "landscape",
+    "width": 1600,
+    "height": 1067,
+    "dominantColor": "#e8e8e2"
+  },
+  {
+    "id": "photo-002",
+    "src": "/images/gallery/photo-002.webp",
+    "thumbSrc": "/images/gallery/thumbs/photo-002.webp",
+    "alt": "Soft morning light across a cafe window",
+    "title": "Morning Glass",
+    "location": "Da Lat, Vietnam",
+    "year": "2025",
+    "category": "Daily",
+    "ratio": "portrait",
+    "width": 1200,
+    "height": 1600,
+    "dominantColor": "#d8d5c8"
+  },
+  {
+    "id": "photo-003",
+    "src": "/images/gallery/photo-003.webp",
+    "thumbSrc": "/images/gallery/thumbs/photo-003.webp",
+    "alt": "A square crop of concrete stairs and shadow",
+    "title": "Concrete Quiet",
+    "location": "Seoul, South Korea",
+    "year": "2024",
+    "category": "Architecture",
+    "ratio": "square",
+    "width": 1400,
+    "height": 1400,
+    "dominantColor": "#c9cbc7"
+  }
+]

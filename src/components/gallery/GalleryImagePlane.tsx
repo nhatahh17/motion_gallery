@@ -7,6 +7,7 @@ import type { Mesh, MeshBasicMaterial, Texture } from "three";
 import type { MutableRefObject } from "react";
 import type { GalleryImage } from "@/lib/gallery/types";
 import type { GalleryLayoutMode, GalleryViewportMode } from "@/lib/gallery/layout";
+import { isGalleryClick } from "@/lib/gallery/detail";
 import { getGalleryLayout } from "@/lib/gallery/layout";
 import { getGalleryPlaneSize } from "@/lib/gallery/plane";
 
@@ -14,6 +15,7 @@ type GalleryImagePlaneProps = {
   image: GalleryImage;
   index: number;
   layoutMode: GalleryLayoutMode;
+  onSelect: (imageId: string) => void;
   total: number;
   progressRef: MutableRefObject<number>;
   viewport: GalleryViewportMode;
@@ -23,6 +25,7 @@ export function GalleryImagePlane({
   image,
   index,
   layoutMode,
+  onSelect,
   progressRef,
   total,
   viewport
@@ -33,6 +36,7 @@ export function GalleryImagePlane({
   const invalidate = useThree((state) => state.invalidate);
   const meshRef = useRef<Mesh | null>(null);
   const materialRef = useRef<MeshBasicMaterial | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   useFrame(() => {
     const placement = getGalleryLayout({
@@ -104,6 +108,26 @@ export function GalleryImagePlane({
 
   return (
     <mesh
+      onPointerDown={(event) => {
+        pointerStartRef.current = { x: event.nativeEvent.clientX, y: event.nativeEvent.clientY };
+      }}
+      onPointerUp={(event) => {
+        const pointerStart = pointerStartRef.current;
+        pointerStartRef.current = null;
+
+        if (
+          pointerStart &&
+          isGalleryClick({
+            startX: pointerStart.x,
+            startY: pointerStart.y,
+            endX: event.nativeEvent.clientX,
+            endY: event.nativeEvent.clientY
+          })
+        ) {
+          event.stopPropagation();
+          onSelect(image.id);
+        }
+      }}
       ref={meshRef}
       userData={{ galleryImageId: image.id, textureSource: image.thumbSrc }}
     >

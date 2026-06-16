@@ -138,6 +138,104 @@ select {
   display: block;
 }
 
+.gallery-detail-backdrop {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: grid;
+  padding: 18px;
+  place-items: center;
+  background: rgba(248, 248, 244, 0.72);
+  backdrop-filter: blur(18px);
+  cursor: default;
+  touch-action: auto;
+}
+
+.gallery-detail-modal {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
+  gap: 18px;
+  width: min(900px, 100%);
+  max-height: 100%;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 80px rgba(16, 16, 16, 0.14);
+}
+
+.gallery-detail-image {
+  display: block;
+  width: 100%;
+  max-height: min(70vh, 560px);
+  object-fit: contain;
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.gallery-detail-copy {
+  align-self: end;
+  padding: 18px 12px 8px;
+}
+
+.gallery-detail-kicker,
+.gallery-detail-copy p,
+.gallery-detail-copy h2,
+.gallery-detail-copy dl {
+  margin: 0;
+}
+
+.gallery-detail-kicker {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.gallery-detail-copy h2 {
+  margin-top: 10px;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.gallery-detail-copy p:not(.gallery-detail-kicker) {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.gallery-detail-copy dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 14px;
+  margin-top: 22px;
+  font-size: 13px;
+}
+
+.gallery-detail-copy dt {
+  color: var(--muted);
+}
+
+.gallery-detail-copy dd {
+  margin: 0;
+}
+
+.gallery-detail-close {
+  position: absolute;
+  z-index: 1;
+  top: 22px;
+  right: 22px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(248, 248, 244, 0.86);
+  color: var(--text);
+  cursor: pointer;
+}
+
 .gallery-state {
   display: grid;
   width: min(1180px, 100%);
@@ -262,5 +360,27 @@ select {
     min-height: 30px;
     padding: 0 8px;
     font-size: 11px;
+  }
+
+  .gallery-detail-backdrop {
+    padding: 12px;
+  }
+
+  .gallery-detail-modal {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .gallery-detail-copy {
+    padding: 8px 2px 2px;
+  }
+
+  .gallery-detail-copy h2 {
+    font-size: 30px;
+  }
+
+  .gallery-detail-image {
+    max-height: 48vh;
   }
 }

@@ -5,15 +5,16 @@ export default function Home() {
     <main className="page-shell">
       <header className="site-header">
         <p className="site-kicker">Personal Motion Gallery</p>
-        <p className="site-phase">Phase 6 / 3D Horizon mode</p>
+        <p className="site-phase">Phase 7 / image detail modal</p>
       </header>
 
       <section className="intro-section" aria-labelledby="page-title">
         <div>
           <h1 id="page-title">Motion gallery</h1>
           <p>
-            Thirty local JSON images now move through layered rings, a spatial
-            3D circle, and a cinematic horizon strip with drag momentum intact.
+            Thirty local JSON images move through layered rings, spatial 3D,
+            and a cinematic horizon strip. Tap a frame to inspect the quiet
+            metadata behind it.
           </p>
         </div>
       </section>

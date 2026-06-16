@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Personal Motion Gallery",
   description:
-    "An experimental WebGL photo gallery with layered 2D circle motion and local JSON image data."
+    "An experimental WebGL photo gallery with motion-led layouts and quiet image metadata."
 };
 
 export default function RootLayout({

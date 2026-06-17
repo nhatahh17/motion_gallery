@@ -7,7 +7,8 @@ import type { GalleryImage } from "@/lib/gallery/types";
 import {
   getAdjacentGalleryImageId,
   getFocusedGalleryImage,
-  getGalleryImageById
+  getGalleryImageById,
+  getGalleryModalPreloadTargets
 } from "@/lib/gallery/detail";
 import {
   getViewportMode,
@@ -47,6 +48,9 @@ export function GalleryCanvas({
   const modalOpenRef = useRef(false);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
+  const modalPreloadTargets = selectedImage
+    ? getGalleryModalPreloadTargets(images, selectedImage.id)
+    : [];
   const motionCursor = getMotionCursorState({
     dragging: cursorDragging,
     hoveredImageId,
@@ -321,6 +325,9 @@ export function GalleryCanvas({
           onPointerDown={(event) => event.stopPropagation()}
           role="dialog"
         >
+          {modalPreloadTargets.map((src) => (
+            <link as="image" data-gallery-modal-preload="" href={src} key={src} rel="preload" />
+          ))}
           <article
             aria-label={selectedImage.title ?? selectedImage.alt}
             className="gallery-detail-modal"

@@ -3,6 +3,7 @@ import {
   buildGalleryPhotoHref,
   clearGalleryPhotoHref,
   getAdjacentGalleryImageId,
+  getGalleryModalPreloadTargets,
   getFocusedGalleryImage,
   getGalleryImageById,
   getGalleryPhotoIdFromSearchParams,
@@ -33,6 +34,21 @@ const images: GalleryImage[] = [
     category: "Daily",
     width: 1200,
     height: 1600
+  }
+];
+
+const threeImages: GalleryImage[] = [
+  ...images,
+  {
+    id: "photo-003",
+    src: "/images/gallery/photo-003.png",
+    thumbSrc: "/images/gallery/thumbs/photo-003.png",
+    alt: "A pale corner wall with afternoon light",
+    location: "Da Lat, Vietnam",
+    year: "2025",
+    category: "Architecture",
+    width: 1400,
+    height: 1400
   }
 ];
 
@@ -99,5 +115,23 @@ describe("gallery detail URL helpers", () => {
     expect(clearGalleryPhotoHref(new URLSearchParams("category=Street&photo=photo-001"))).toBe(
       "/?category=Street"
     );
+  });
+});
+
+describe("getGalleryModalPreloadTargets", () => {
+  it("returns previous and next full-size image sources for the selected modal image", () => {
+    expect(getGalleryModalPreloadTargets(threeImages, "photo-002")).toEqual([
+      "/images/gallery/photo-001.png",
+      "/images/gallery/photo-003.png"
+    ]);
+  });
+
+  it("wraps preload targets and ignores missing or single-image selections", () => {
+    expect(getGalleryModalPreloadTargets(threeImages, "photo-001")).toEqual([
+      "/images/gallery/photo-003.png",
+      "/images/gallery/photo-002.png"
+    ]);
+    expect(getGalleryModalPreloadTargets(threeImages, "missing")).toEqual([]);
+    expect(getGalleryModalPreloadTargets([threeImages[0]], "photo-001")).toEqual([]);
   });
 });

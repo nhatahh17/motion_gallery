@@ -34,6 +34,7 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-013 | Shareable image deep links | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke opened `?photo=photo-002`, advanced modal URL to `photo-003`, removed `photo` on close, ignored an unknown image id, and found 0 console errors. |
 | US-014 | Wheel and trackpad navigation | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified wheel input changes the rendered gallery page, horizontal wheel works after switching to `3D Horizon`, modal open/close still works, and 0 console errors. |
 | US-015 | Rounded image treatment | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 14 label, canvas load, `3D Horizon` switch, modal open/close, modal image rounded treatment, and 0 console errors. |
+| US-016 | Smooth modal image preloading | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified modal preload links target adjacent full-size images, Next navigation works, preload links disappear on close, and 0 console errors. |
 
 ## Evidence Rules
 

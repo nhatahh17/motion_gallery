@@ -36,6 +36,26 @@ export function getAdjacentGalleryImageId(
   return images[nextIndex]?.id ?? null;
 }
 
+export function getGalleryModalPreloadTargets(images: GalleryImage[], currentImageId: string) {
+  if (images.length < 2) {
+    return [];
+  }
+
+  const currentIndex = images.findIndex((image) => image.id === currentImageId);
+
+  if (currentIndex === -1) {
+    return [];
+  }
+
+  const previousImage = images[(currentIndex - 1 + images.length) % images.length];
+  const nextImage = images[(currentIndex + 1) % images.length];
+  const currentSrc = images[currentIndex]?.src;
+
+  return Array.from(
+    new Set([previousImage?.src, nextImage?.src].filter((src): src is string => Boolean(src)))
+  ).filter((src) => src !== currentSrc);
+}
+
 export function isGalleryClick({
   startX,
   startY,

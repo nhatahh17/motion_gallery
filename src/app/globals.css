@@ -97,22 +97,38 @@ select {
   user-select: none;
 }
 
-.layout-switcher {
+.gallery-controls {
   position: absolute;
   z-index: 2;
   top: 14px;
   right: 14px;
+  left: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.layout-switcher,
+.category-switcher {
   display: inline-flex;
   gap: 4px;
-  max-width: calc(100% - 28px);
+  max-width: 100%;
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(248, 248, 244, 0.78);
   backdrop-filter: blur(16px);
+  pointer-events: auto;
 }
 
-.layout-switcher-button {
+.category-switcher {
+  overflow-x: auto;
+}
+
+.layout-switcher-button,
+.category-switcher-button {
   min-height: 32px;
   white-space: nowrap;
   padding: 0 12px;
@@ -125,7 +141,8 @@ select {
   letter-spacing: 0;
 }
 
-.layout-switcher-button[aria-pressed="true"] {
+.layout-switcher-button[aria-pressed="true"],
+.category-switcher-button[aria-pressed="true"] {
   background: rgba(16, 16, 16, 0.88);
   color: #fff;
 }
@@ -504,13 +521,21 @@ select {
     min-height: 360px;
   }
 
-  .layout-switcher {
+  .gallery-controls {
     top: 10px;
     right: 10px;
-    max-width: calc(100% - 20px);
+    left: 10px;
+    flex-direction: column-reverse;
+    align-items: flex-end;
   }
 
-  .layout-switcher-button {
+  .layout-switcher,
+  .category-switcher {
+    max-width: 100%;
+  }
+
+  .layout-switcher-button,
+  .category-switcher-button {
     min-height: 30px;
     padding: 0 8px;
     font-size: 11px;

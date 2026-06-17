@@ -30,6 +30,7 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-009 | Experimental hover cursor polish | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified desktop `View` cursor, mobile hidden cursor, modal open/close, and 0 console errors. |
 | US-010 | Loading intro polish | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 9 label, canvas load, hidden intro after ready, modal open/close, no horizontal overflow on mobile, and 0 console errors. |
 | US-011 | Release metadata and final QA readiness | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 10 label, metadata/OG/Twitter tags, layout switch, modal open/close, mobile no horizontal overflow, and 0 console errors. |
+| US-012 | Category filter controls | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke filtered `Street`, restored `All`, switched to `3D Horizon`, opened/closed modal, found 0 console errors, and found no horizontal overflow. |
 
 ## Evidence Rules
 

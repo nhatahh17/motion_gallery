@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
+import type { GalleryCategoryFilter } from "@/lib/gallery/category";
 import type { GalleryImage } from "@/lib/gallery/types";
 import {
   getAdjacentGalleryImageId,
@@ -19,10 +20,18 @@ import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
 
 type GalleryCanvasProps = {
+  categoryFilter: GalleryCategoryFilter;
+  categoryOptions: string[];
   images: GalleryImage[];
+  onCategoryFilterChange: (category: GalleryCategoryFilter) => void;
 };
 
-export function GalleryCanvas({ images }: GalleryCanvasProps) {
+export function GalleryCanvas({
+  categoryFilter,
+  categoryOptions,
+  images,
+  onCategoryFilterChange
+}: GalleryCanvasProps) {
   const dpr = useViewportDpr();
   const [layoutMode, setLayoutMode] = useState<GalleryLayoutMode>("circle2d");
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -82,6 +91,13 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
   );
 
   useEffect(() => {
+    if (selectedImageId && !selectedImage) {
+      setSelectedImageId(null);
+      modalOpenRef.current = false;
+    }
+  }, [selectedImage, selectedImageId]);
+
+  useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     function updateReducedMotion() {
@@ -139,7 +155,7 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
         if (
           selectedImage ||
           (event.target instanceof Element &&
-            event.target.closest(".layout-switcher, .gallery-detail-backdrop"))
+            event.target.closest(".layout-switcher, .category-switcher, .gallery-detail-backdrop"))
         ) {
           return;
         }
@@ -180,23 +196,44 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
         setCursorDragging(false);
       }}
     >
-      <div
-        className="layout-switcher"
-        aria-label="Gallery layout"
-        onPointerDown={(event) => event.stopPropagation()}
-      >
-        {layoutOptions.map((option) => (
+      <div className="gallery-controls" onPointerDown={(event) => event.stopPropagation()}>
+        <div className="category-switcher" aria-label="Gallery category">
           <button
-            aria-pressed={layoutMode === option.value}
-            className="layout-switcher-button"
-            key={option.value}
-            onClick={() => setLayoutMode(option.value)}
+            aria-pressed={categoryFilter === "all"}
+            className="category-switcher-button"
+            onClick={() => onCategoryFilterChange("all")}
             onPointerUp={(event) => event.stopPropagation()}
             type="button"
           >
-            {option.label}
+            All
           </button>
-        ))}
+          {categoryOptions.map((category) => (
+            <button
+              aria-pressed={categoryFilter === category}
+              className="category-switcher-button"
+              key={category}
+              onClick={() => onCategoryFilterChange(category)}
+              onPointerUp={(event) => event.stopPropagation()}
+              type="button"
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+        <div className="layout-switcher" aria-label="Gallery layout">
+          {layoutOptions.map((option) => (
+            <button
+              aria-pressed={layoutMode === option.value}
+              className="layout-switcher-button"
+              key={option.value}
+              onClick={() => setLayoutMode(option.value)}
+              onPointerUp={(event) => event.stopPropagation()}
+              type="button"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
       <Canvas
         camera={{ position: [0, 0, 7.2], fov: 42, near: 0.1, far: 100 }}

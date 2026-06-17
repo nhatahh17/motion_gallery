@@ -1,6 +1,7 @@
 import type { GalleryImage } from "./types";
 
 const clickMovementThreshold = 6;
+const photoQueryParam = "photo";
 
 export function getGalleryImageById(images: GalleryImage[], imageId: string | null) {
   if (!imageId) {
@@ -47,4 +48,26 @@ export function isGalleryClick({
   endY: number;
 }) {
   return Math.hypot(endX - startX, endY - startY) <= clickMovementThreshold;
+}
+
+export function getGalleryPhotoIdFromSearchParams(searchParams: URLSearchParams) {
+  const photoId = searchParams.get(photoQueryParam);
+  return photoId && photoId.trim().length > 0 ? photoId : null;
+}
+
+export function buildGalleryPhotoHref(searchParams: URLSearchParams, imageId: string) {
+  const nextParams = new URLSearchParams(searchParams);
+  nextParams.set(photoQueryParam, imageId);
+  return buildGalleryHref(nextParams);
+}
+
+export function clearGalleryPhotoHref(searchParams: URLSearchParams) {
+  const nextParams = new URLSearchParams(searchParams);
+  nextParams.delete(photoQueryParam);
+  return buildGalleryHref(nextParams);
+}
+
+function buildGalleryHref(searchParams: URLSearchParams) {
+  const query = searchParams.toString();
+  return query ? `/?${query}` : "/";
 }

@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildGalleryPhotoHref,
+  clearGalleryPhotoHref,
   getAdjacentGalleryImageId,
   getFocusedGalleryImage,
   getGalleryImageById,
+  getGalleryPhotoIdFromSearchParams,
   isGalleryClick
 } from "./detail";
 import type { GalleryImage } from "./types";
@@ -76,5 +79,25 @@ describe("getAdjacentGalleryImageId", () => {
     expect(getAdjacentGalleryImageId(images, "photo-002", "next")).toBe("photo-001");
     expect(getAdjacentGalleryImageId(images, "photo-001", "previous")).toBe("photo-002");
     expect(getAdjacentGalleryImageId(images, "missing", "next")).toBeNull();
+  });
+});
+
+describe("gallery detail URL helpers", () => {
+  it("reads a selected photo id from query params", () => {
+    expect(getGalleryPhotoIdFromSearchParams(new URLSearchParams("photo=photo-002"))).toBe(
+      "photo-002"
+    );
+    expect(getGalleryPhotoIdFromSearchParams(new URLSearchParams("category=Street"))).toBeNull();
+  });
+
+  it("builds and clears shareable photo hrefs while preserving other params", () => {
+    const params = new URLSearchParams("category=Street&page=1");
+
+    expect(buildGalleryPhotoHref(params, "photo-001")).toBe(
+      "/?category=Street&page=1&photo=photo-001"
+    );
+    expect(clearGalleryPhotoHref(new URLSearchParams("category=Street&photo=photo-001"))).toBe(
+      "/?category=Street"
+    );
   });
 });

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { GalleryExperience } from "@/components/gallery/GalleryExperience";
 
 export default function Home() {
@@ -5,7 +6,7 @@ export default function Home() {
     <main className="page-shell">
       <header className="site-header">
         <p className="site-kicker">Personal Motion Gallery</p>
-        <p className="site-phase">Phase 11 / category filters</p>
+        <p className="site-phase">Phase 12 / shareable image links</p>
       </header>
 
       <section className="intro-section" aria-labelledby="page-title">
@@ -19,7 +20,9 @@ export default function Home() {
         </div>
       </section>
 
-      <GalleryExperience />
+      <Suspense fallback={null}>
+        <GalleryExperience />
+      </Suspense>
     </main>
   );
 }

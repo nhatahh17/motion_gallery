@@ -1,0 +1,8 @@
+
+> motion-gallery@0.1.0 start
+> next start -p 3013 -H 127.0.0.1
+
+▲ Next.js 16.2.9
+- Local:         http://127.0.0.1:3013
+- Network:       http://127.0.0.1:3013
+✓ Ready in 501ms

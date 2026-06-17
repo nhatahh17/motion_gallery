@@ -24,13 +24,17 @@ type GalleryCanvasProps = {
   categoryOptions: string[];
   images: GalleryImage[];
   onCategoryFilterChange: (category: GalleryCategoryFilter) => void;
+  onSelectedPhotoIdChange: (imageId: string | null) => void;
+  selectedPhotoId: string | null;
 };
 
 export function GalleryCanvas({
   categoryFilter,
   categoryOptions,
   images,
-  onCategoryFilterChange
+  onCategoryFilterChange,
+  onSelectedPhotoIdChange,
+  selectedPhotoId
 }: GalleryCanvasProps) {
   const dpr = useViewportDpr();
   const [layoutMode, setLayoutMode] = useState<GalleryLayoutMode>("circle2d");
@@ -53,19 +57,26 @@ export function GalleryCanvas({
 
   const closeModal = useCallback(() => {
     setSelectedImageId(null);
+    onSelectedPhotoIdChange(null);
     modalOpenRef.current = false;
     galleryProgress.velocityRef.current = 0;
     galleryProgress.resumeAutoplayAtRef.current =
       window.performance.now() + 2200;
-  }, [galleryProgress.resumeAutoplayAtRef, galleryProgress.velocityRef]);
+  }, [galleryProgress.resumeAutoplayAtRef, galleryProgress.velocityRef, onSelectedPhotoIdChange]);
 
   const selectImage = useCallback((imageId: string) => {
     setSelectedImageId(imageId);
+    onSelectedPhotoIdChange(imageId);
     modalOpenRef.current = true;
     galleryProgress.draggingRef.current = false;
     galleryProgress.velocityRef.current = 0;
     galleryProgress.resumeAutoplayAtRef.current = Number.POSITIVE_INFINITY;
-  }, [galleryProgress.draggingRef, galleryProgress.resumeAutoplayAtRef, galleryProgress.velocityRef]);
+  }, [
+    galleryProgress.draggingRef,
+    galleryProgress.resumeAutoplayAtRef,
+    galleryProgress.velocityRef,
+    onSelectedPhotoIdChange
+  ]);
 
   const selectFocusedImage = useCallback(() => {
     const focusedImage = getFocusedGalleryImage(images, galleryProgress.progressRef.current);
@@ -85,17 +96,52 @@ export function GalleryCanvas({
 
       if (nextImageId) {
         setSelectedImageId(nextImageId);
+        onSelectedPhotoIdChange(nextImageId);
       }
     },
-    [images, selectedImageId]
+    [images, onSelectedPhotoIdChange, selectedImageId]
   );
 
   useEffect(() => {
     if (selectedImageId && !selectedImage) {
       setSelectedImageId(null);
       modalOpenRef.current = false;
+      onSelectedPhotoIdChange(null);
     }
-  }, [selectedImage, selectedImageId]);
+  }, [onSelectedPhotoIdChange, selectedImage, selectedImageId]);
+
+  useEffect(() => {
+    if (!selectedPhotoId) {
+      if (selectedImageId) {
+        setSelectedImageId(null);
+        modalOpenRef.current = false;
+      }
+      return;
+    }
+
+    const linkedImage = getGalleryImageById(images, selectedPhotoId);
+
+    if (!linkedImage) {
+      onSelectedPhotoIdChange(null);
+      return;
+    }
+
+    if (selectedPhotoId !== selectedImageId) {
+      setSelectedImageId(selectedPhotoId);
+      modalOpenRef.current = true;
+      galleryProgress.draggingRef.current = false;
+      galleryProgress.velocityRef.current = 0;
+      galleryProgress.resumeAutoplayAtRef.current = Number.POSITIVE_INFINITY;
+    }
+  }, [
+    galleryProgress.draggingRef,
+    galleryProgress.resumeAutoplayAtRef,
+    galleryProgress.velocityRef,
+    images,
+    onSelectedPhotoIdChange,
+    selectedImageId,
+    selectedPhotoId
+  ]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");

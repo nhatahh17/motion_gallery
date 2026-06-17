@@ -25,6 +25,9 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-004 | Drag touch and inertia | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright drag smoke changed shell screenshot hash and mobile shell had `touch-action: none`. |
 | US-005 | 3D Circle layout and switcher | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke switched to `3D Circle`, showed active state, rendered canvas, and 0 console errors. |
 | US-006 | 3D Horizon layout and three-mode switcher | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop/mobile smoke switched to `3D Horizon`, showed active state, rendered canvas, and 0 console errors. |
+| US-007 | Image detail modal | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright production desktop/mobile smoke opened image detail modal with metadata, Escape close worked, and 0 console errors. |
+| US-008 | Accessibility and reduced motion pass | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright desktop smoke verified modal Next button, ArrowLeft/ArrowRight, Escape close, and 0 console errors. |
+| US-009 | Experimental hover cursor polish | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified desktop `View` cursor, mobile hidden cursor, modal open/close, and 0 console errors. |
 
 ## Evidence Rules
 

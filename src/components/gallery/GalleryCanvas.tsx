@@ -13,6 +13,7 @@ import {
   type GalleryLayoutMode,
   type GalleryViewportMode
 } from "@/lib/gallery/layout";
+import { getMotionCursorState } from "@/lib/gallery/cursor";
 import { GalleryScene } from "./GalleryScene";
 import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
@@ -26,10 +27,20 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
   const [layoutMode, setLayoutMode] = useState<GalleryLayoutMode>("circle2d");
   const [reducedMotion, setReducedMotion] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
+  const [cursorDragging, setCursorDragging] = useState(false);
+  const [cursorPoint, setCursorPoint] = useState({ x: 0, y: 0 });
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
+  const motionCursor = getMotionCursorState({
+    dragging: cursorDragging,
+    hoveredImageId,
+    modalOpen: Boolean(selectedImage),
+    reducedMotion,
+    viewport
+  });
 
   const closeModal = useCallback(() => {
     setSelectedImageId(null);
@@ -136,6 +147,38 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
         selectFocusedImage();
       }}
       {...galleryProgress.bind}
+      onPointerCancel={(event) => {
+        galleryProgress.bind.onPointerCancel(event);
+        setCursorDragging(false);
+      }}
+      onPointerDown={(event) => {
+        setCursorPoint({ x: event.clientX, y: event.clientY });
+        galleryProgress.bind.onPointerDown(event);
+        setCursorDragging(galleryProgress.draggingRef.current);
+      }}
+      onPointerLeave={(event) => {
+        galleryProgress.bind.onPointerLeave(event);
+        setCursorDragging(false);
+        setHoveredImageId(null);
+      }}
+      onPointerMove={(event) => {
+        galleryProgress.bind.onPointerMove(event);
+        setCursorPoint({ x: event.clientX, y: event.clientY });
+        setCursorDragging(galleryProgress.draggingRef.current);
+        if (
+          !selectedImage &&
+          event.target instanceof Element &&
+          !event.target.closest(".layout-switcher, .gallery-detail-backdrop")
+        ) {
+          setHoveredImageId(
+            getFocusedGalleryImage(images, galleryProgress.progressRef.current)?.id ?? null
+          );
+        }
+      }}
+      onPointerUp={(event) => {
+        galleryProgress.bind.onPointerUp(event);
+        setCursorDragging(false);
+      }}
     >
       <div
         className="layout-switcher"
@@ -169,6 +212,7 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
           images={images}
           layoutMode={layoutMode}
           modalOpenRef={modalOpenRef}
+          onHoverImage={setHoveredImageId}
           onSelectImage={selectImage}
           progressRef={galleryProgress.progressRef}
           reducedMotion={reducedMotion}
@@ -176,6 +220,16 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
           velocityRef={galleryProgress.velocityRef}
         />
       </Canvas>
+      <div
+        aria-hidden="true"
+        className={`motion-cursor motion-cursor-${motionCursor.variant}`}
+        data-visible={motionCursor.visible ? "true" : "false"}
+        style={{
+          transform: `translate3d(${cursorPoint.x}px, ${cursorPoint.y}px, 0)`
+        }}
+      >
+        {motionCursor.label}
+      </div>
       {selectedImage ? (
         <div
           aria-modal="true"

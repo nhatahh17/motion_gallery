@@ -16,6 +16,7 @@ type GallerySceneProps = {
   images: GalleryImage[];
   layoutMode: GalleryLayoutMode;
   modalOpenRef: MutableRefObject<boolean>;
+  onHoverImage: (imageId: string | null) => void;
   onSelectImage: (imageId: string) => void;
   progressRef: MutableRefObject<number>;
   reducedMotion: boolean;
@@ -28,6 +29,7 @@ export function GalleryScene({
   images,
   layoutMode,
   modalOpenRef,
+  onHoverImage,
   onSelectImage,
   progressRef,
   reducedMotion,
@@ -73,6 +75,7 @@ export function GalleryScene({
             index={index}
             key={image.id}
             layoutMode={layoutMode}
+            onHover={onHoverImage}
             onSelect={onSelectImage}
             progressRef={progressRef}
             total={images.length}

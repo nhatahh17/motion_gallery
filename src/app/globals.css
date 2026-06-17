@@ -138,6 +138,35 @@ select {
   display: block;
 }
 
+.motion-cursor {
+  position: fixed;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 58px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(16, 16, 16, 0.18);
+  border-radius: 50%;
+  background: rgba(248, 248, 244, 0.72);
+  color: var(--text);
+  font-size: 11px;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  text-transform: uppercase;
+  transition: opacity 160ms ease, width 160ms ease;
+}
+
+.motion-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.motion-cursor-drag {
+  width: 66px;
+}
+
 .gallery-detail-backdrop {
   position: absolute;
   z-index: 5;

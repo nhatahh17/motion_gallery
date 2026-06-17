@@ -15,6 +15,7 @@ type GalleryImagePlaneProps = {
   image: GalleryImage;
   index: number;
   layoutMode: GalleryLayoutMode;
+  onHover: (imageId: string | null) => void;
   onSelect: (imageId: string) => void;
   total: number;
   progressRef: MutableRefObject<number>;
@@ -25,6 +26,7 @@ export function GalleryImagePlane({
   image,
   index,
   layoutMode,
+  onHover,
   onSelect,
   progressRef,
   total,
@@ -108,6 +110,8 @@ export function GalleryImagePlane({
 
   return (
     <mesh
+      onPointerEnter={() => onHover(image.id)}
+      onPointerLeave={() => onHover(null)}
       onPointerDown={(event) => {
         pointerStartRef.current = { x: event.nativeEvent.clientX, y: event.nativeEvent.clientY };
       }}

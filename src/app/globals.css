@@ -302,6 +302,112 @@ select {
   text-transform: uppercase;
 }
 
+.loading-intro {
+  position: relative;
+  display: grid;
+  width: min(1180px, 100%);
+  min-height: 420px;
+  margin: 0 auto 24px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95), transparent 34%),
+    var(--panel);
+  color: var(--text);
+  text-align: center;
+}
+
+.loading-intro::before {
+  position: absolute;
+  inset: 22%;
+  border: 1px solid rgba(16, 16, 16, 0.1);
+  border-radius: 50%;
+  content: "";
+  animation: intro-orbit 3.8s ease-in-out infinite;
+}
+
+.loading-intro[data-tone="reduced"]::before {
+  animation: none;
+}
+
+.loading-intro-mark {
+  position: relative;
+  display: grid;
+  width: min(310px, 72vw);
+  aspect-ratio: 1;
+  place-items: center;
+}
+
+.loading-intro-mark span {
+  position: absolute;
+  width: 42%;
+  aspect-ratio: 1.35;
+  border: 1px solid rgba(16, 16, 16, 0.14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.76);
+  transform-origin: 50% 145%;
+}
+
+.loading-intro-mark span:nth-child(1) {
+  transform: rotate(-18deg) translateY(-24px);
+}
+
+.loading-intro-mark span:nth-child(2) {
+  transform: translateY(-36px);
+}
+
+.loading-intro-mark span:nth-child(3) {
+  transform: rotate(18deg) translateY(-24px);
+}
+
+.loading-intro-kicker,
+.loading-intro-copy,
+.loading-intro-count,
+.loading-intro h2 {
+  position: relative;
+  margin: 0;
+}
+
+.loading-intro-kicker,
+.loading-intro-count {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.loading-intro h2 {
+  margin-top: -72px;
+  font-size: clamp(34px, 6vw, 72px);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 0.94;
+}
+
+.loading-intro-copy {
+  width: min(420px, 82vw);
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.loading-intro-count {
+  margin-top: 18px;
+}
+
+@keyframes intro-orbit {
+  0%,
+  100% {
+    transform: scale(0.96) rotate(0deg);
+  }
+
+  50% {
+    transform: scale(1.04) rotate(8deg);
+  }
+}
+
 .debug-panel {
   width: min(920px, 100%);
   margin: 0 auto;

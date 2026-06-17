@@ -123,12 +123,33 @@ select {
   pointer-events: auto;
 }
 
+.layout-switcher {
+  position: relative;
+  isolation: isolate;
+}
+
+.layout-switcher-pill {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(var(--layout-pill-width, 33.333%) - 4px);
+  border-radius: 6px;
+  background: rgba(16, 16, 16, 0.88);
+  pointer-events: none;
+  transform: translate3d(var(--layout-pill-translate, 0%), 0, 0);
+  transition: transform var(--layout-pill-duration, 260ms) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .category-switcher {
   overflow-x: auto;
 }
 
 .layout-switcher-button,
 .category-switcher-button {
+  position: relative;
+  z-index: 1;
   min-height: 32px;
   white-space: nowrap;
   padding: 0 12px;
@@ -143,8 +164,11 @@ select {
 
 .layout-switcher-button[aria-pressed="true"],
 .category-switcher-button[aria-pressed="true"] {
-  background: rgba(16, 16, 16, 0.88);
   color: #fff;
+}
+
+.category-switcher-button[aria-pressed="true"] {
+  background: rgba(16, 16, 16, 0.88);
 }
 
 .gallery-canvas-shell:active {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Canvas } from "@react-three/fiber";
 import type { GalleryCategoryFilter } from "@/lib/gallery/category";
 import type { GalleryImage } from "@/lib/gallery/types";
@@ -17,6 +17,7 @@ import {
   type GalleryViewportMode
 } from "@/lib/gallery/layout";
 import { getMotionCursorState } from "@/lib/gallery/cursor";
+import { getLayoutSwitcherPillState } from "@/lib/gallery/switcher";
 import { GalleryScene } from "./GalleryScene";
 import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
@@ -57,6 +58,11 @@ export function GalleryCanvas({
   const modalPreloadTargets = selectedImage
     ? getGalleryModalPreloadTargets(images, selectedImage.id)
     : [];
+  const layoutPill = getLayoutSwitcherPillState({
+    activeLayout: layoutMode,
+    layoutOrder: layoutOptions.map((option) => option.value),
+    reducedMotion
+  });
   const motionCursor = getMotionCursorState({
     dragging: cursorDragging,
     hoveredImageId,
@@ -305,7 +311,16 @@ export function GalleryCanvas({
             </button>
           ))}
         </div>
-        <div className="layout-switcher" aria-label="Gallery layout">
+        <div
+          className="layout-switcher"
+          aria-label="Gallery layout"
+          style={{
+            "--layout-pill-duration": `${layoutPill.durationMs}ms`,
+            "--layout-pill-translate": `${layoutPill.translatePercent}%`,
+            "--layout-pill-width": `${layoutPill.widthPercent}%`
+          } as CSSProperties}
+        >
+          <span aria-hidden="true" className="layout-switcher-pill" />
           {layoutOptions.map((option) => (
             <button
               aria-pressed={layoutMode === option.value}

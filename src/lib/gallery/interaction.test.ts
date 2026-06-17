@@ -4,6 +4,7 @@ import {
   decayInertiaVelocity,
   getInertiaVelocityAfterDrag,
   getDragProgressDelta,
+  getWheelProgressDelta,
   shouldAutoplayAdvance
 } from "./interaction";
 
@@ -18,6 +19,31 @@ describe("getDragProgressDelta", () => {
     const mobile = Math.abs(getDragProgressDelta({ deltaX: 24, viewport: "mobile" }));
 
     expect(mobile).toBeGreaterThan(desktop);
+  });
+});
+
+describe("getWheelProgressDelta", () => {
+  it("maps vertical wheel and trackpad movement into gallery progress", () => {
+    expect(getWheelProgressDelta({ deltaX: 0, deltaY: 50, viewport: "desktop" })).toBeCloseTo(
+      0.14
+    );
+    expect(getWheelProgressDelta({ deltaX: 0, deltaY: -50, viewport: "desktop" })).toBeCloseTo(
+      -0.14
+    );
+  });
+
+  it("prefers horizontal trackpad intent over vertical page scroll intent", () => {
+    expect(getWheelProgressDelta({ deltaX: 30, deltaY: 4, viewport: "desktop" })).toBeCloseTo(
+      0.084
+    );
+  });
+
+  it("uses gentler mobile sensitivity and clamps extreme wheel bursts", () => {
+    const desktop = Math.abs(getWheelProgressDelta({ deltaX: 0, deltaY: 40, viewport: "desktop" }));
+    const mobile = Math.abs(getWheelProgressDelta({ deltaX: 0, deltaY: 40, viewport: "mobile" }));
+
+    expect(mobile).toBeLessThan(desktop);
+    expect(getWheelProgressDelta({ deltaX: 0, deltaY: 10_000, viewport: "desktop" })).toBe(0.42);
   });
 });
 

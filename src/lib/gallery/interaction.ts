@@ -9,6 +9,14 @@ export const galleryDragConfig = {
   resumeDelay: 2200
 } as const;
 
+export const galleryWheelConfig = {
+  sensitivityDesktop: 0.0028,
+  sensitivityMobile: 0.0016,
+  maxDelta: 0.42,
+  velocityFactor: 0.18,
+  resumeDelay: 1400
+} as const;
+
 export function getDragProgressDelta({
   deltaX,
   viewport
@@ -22,6 +30,25 @@ export function getDragProgressDelta({
       : galleryDragConfig.sensitivityDesktop;
 
   return -deltaX * sensitivity;
+}
+
+export function getWheelProgressDelta({
+  deltaX,
+  deltaY,
+  viewport
+}: {
+  deltaX: number;
+  deltaY: number;
+  viewport: GalleryViewportMode;
+}) {
+  const dominantDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+  const sensitivity =
+    viewport === "mobile"
+      ? galleryWheelConfig.sensitivityMobile
+      : galleryWheelConfig.sensitivityDesktop;
+  const progressDelta = dominantDelta * sensitivity;
+
+  return Math.max(-galleryWheelConfig.maxDelta, Math.min(galleryWheelConfig.maxDelta, progressDelta));
 }
 
 export function calculateDragVelocity({

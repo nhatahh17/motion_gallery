@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useMemo, useRef } from "react";
-import type { PointerEvent } from "react";
+import type { PointerEvent, WheelEvent } from "react";
 import {
   calculateDragVelocity,
   galleryDragConfig,
+  galleryWheelConfig,
   getDragProgressDelta,
-  getInertiaVelocityAfterDrag
+  getInertiaVelocityAfterDrag,
+  getWheelProgressDelta
 } from "@/lib/gallery/interaction";
 import type { GalleryViewportMode } from "@/lib/gallery/layout";
 
@@ -75,7 +77,32 @@ export function useGalleryProgress(viewport: GalleryViewportMode, reducedMotion:
           });
           lastPointerRef.current = { x: event.clientX, time: now };
         },
-        onPointerUp: endDrag
+        onPointerUp: endDrag,
+        onWheel(event: WheelEvent<HTMLElement>) {
+          if (reducedMotion) {
+            return;
+          }
+
+          const progressDelta = getWheelProgressDelta({
+            deltaX: event.deltaX,
+            deltaY: event.deltaY,
+            viewport
+          });
+
+          if (progressDelta === 0) {
+            return;
+          }
+
+          progressRef.current += progressDelta;
+          velocityRef.current = getInertiaVelocityAfterDrag({
+            reducedMotion,
+            velocity: Math.max(
+              -galleryDragConfig.maxVelocity,
+              Math.min(galleryDragConfig.maxVelocity, progressDelta * galleryWheelConfig.velocityFactor)
+            )
+          });
+          resumeAutoplayAtRef.current = window.performance.now() + galleryWheelConfig.resumeDelay;
+        }
       }
     }),
     [endDrag, reducedMotion, viewport]

@@ -6,6 +6,7 @@ import type { GalleryImage } from "@/lib/gallery/types";
 import { decayInertiaVelocity, shouldAutoplayAdvance } from "@/lib/gallery/interaction";
 import {
   getGalleryAutoplayStep,
+  getDragExpansionFactor,
   getViewportMode,
   type GalleryLayoutMode
 } from "@/lib/gallery/layout";
@@ -37,6 +38,11 @@ export function GalleryScene({
   velocityRef
 }: GallerySceneProps) {
   const viewport = useThree((state) => getViewportMode(state.size.width));
+  const dragExpansion = getDragExpansionFactor({
+    dragging: draggingRef.current && !modalOpenRef.current,
+    reducedMotion,
+    viewport
+  });
 
   useFrame((_, delta) => {
     if (modalOpenRef.current) {
@@ -73,6 +79,7 @@ export function GalleryScene({
           <GalleryImagePlane
             image={image}
             index={index}
+            dragExpansion={dragExpansion}
             key={image.id}
             layoutMode={layoutMode}
             onHover={onHoverImage}

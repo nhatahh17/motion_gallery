@@ -6,7 +6,7 @@ export default function Home() {
     <main className="page-shell">
       <header className="site-header">
         <p className="site-kicker">Personal Motion Gallery</p>
-        <p className="site-phase">Phase 17 / layout switcher pill</p>
+        <p className="site-phase">Phase 18 / drag orbit expansion</p>
       </header>
 
       <section className="intro-section" aria-labelledby="page-title">

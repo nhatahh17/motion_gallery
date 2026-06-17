@@ -2,6 +2,7 @@ export type GalleryViewportMode = "desktop" | "tablet" | "mobile";
 export type GalleryLayoutMode = "circle2d" | "circle3d" | "horizon3d";
 
 type GalleryLayoutInput = {
+  dragExpansion?: number;
   index: number;
   total: number;
   progress: number;
@@ -103,7 +104,30 @@ const autoplayUnitsPerSecond: Record<GalleryLayoutMode, number> = {
   horizon3d: 0.048
 };
 
+const dragExpansionByViewport: Record<GalleryViewportMode, number> = {
+  desktop: 1.08,
+  tablet: 1.055,
+  mobile: 1.035
+};
+
+export function getDragExpansionFactor({
+  dragging,
+  reducedMotion,
+  viewport
+}: {
+  dragging: boolean;
+  reducedMotion: boolean;
+  viewport: GalleryViewportMode;
+}) {
+  if (!dragging || reducedMotion) {
+    return 1;
+  }
+
+  return dragExpansionByViewport[viewport];
+}
+
 export function getCircle2DLayout({
+  dragExpansion = 1,
   index,
   total,
   progress,
@@ -114,8 +138,8 @@ export function getCircle2DLayout({
   const ring = desktopRings[ringIndex];
   const scale = viewportScale[viewport];
   const angle = (index / safeTotal) * Math.PI * 2 + progress * ring.speed;
-  const x = Math.cos(angle) * ring.radiusX * scale;
-  const y = Math.sin(angle) * ring.radiusY * scale;
+  const x = Math.cos(angle) * ring.radiusX * scale * dragExpansion;
+  const y = Math.sin(angle) * ring.radiusY * scale * dragExpansion;
   const z = ringIndex * -0.16;
 
   return {
@@ -132,13 +156,14 @@ export function getCircle2DLayout({
 }
 
 export function getCircle3DLayout({
+  dragExpansion = 1,
   index,
   total,
   progress,
   viewport
 }: Circle3DLayoutInput): Circle3DPlacement {
   const safeTotal = Math.max(total, 1);
-  const radius = circle3DRadius[viewport];
+  const radius = circle3DRadius[viewport] * dragExpansion;
   const angle = (index / safeTotal) * Math.PI * 2 + progress;
   const x = Math.sin(angle) * radius;
   const z = Math.cos(angle) * radius * 0.72;
@@ -160,6 +185,7 @@ export function getCircle3DLayout({
 }
 
 export function getHorizon3DLayout({
+  dragExpansion = 1,
   index,
   total,
   progress,
@@ -172,7 +198,7 @@ export function getHorizon3DLayout({
   const visibleRange = horizonVisibleRange[viewport];
   const emphasis = Math.max(0, 1 - absoluteOffset / visibleRange);
   const direction = Math.sign(laneOffset);
-  const x = laneOffset * horizonSpacing[viewport];
+  const x = laneOffset * horizonSpacing[viewport] * dragExpansion;
   const y = Math.sin((index / safeTotal) * Math.PI * 2) * 0.1 * viewportScale[viewport];
   const z = 1.25 - absoluteOffset * horizonDepth[viewport];
 

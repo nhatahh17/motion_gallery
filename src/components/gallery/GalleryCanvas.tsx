@@ -9,7 +9,8 @@ import {
   getFocusedGalleryImagePreview,
   getFocusedGalleryImage,
   getGalleryImageById,
-  getGalleryModalPreloadTargets
+  getGalleryModalPreloadTargets,
+  isGalleryClick
 } from "@/lib/gallery/detail";
 import {
   getViewportMode,
@@ -53,6 +54,7 @@ export function GalleryCanvas({
   } | null>(null);
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
+  const shellPointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
   const modalPreloadTargets = selectedImage
@@ -251,6 +253,21 @@ export function GalleryCanvas({
           return;
         }
 
+        const pointerStart = shellPointerStartRef.current;
+        shellPointerStartRef.current = null;
+
+        if (
+          pointerStart &&
+          !isGalleryClick({
+            startX: pointerStart.x,
+            startY: pointerStart.y,
+            endX: event.clientX,
+            endY: event.clientY
+          })
+        ) {
+          return;
+        }
+
         selectFocusedImage();
       }}
       {...galleryProgress.bind}
@@ -259,6 +276,7 @@ export function GalleryCanvas({
         setCursorDragging(false);
       }}
       onPointerDown={(event) => {
+        shellPointerStartRef.current = { x: event.clientX, y: event.clientY };
         setCursorPoint({ x: event.clientX, y: event.clientY });
         galleryProgress.bind.onPointerDown(event);
         setCursorDragging(galleryProgress.draggingRef.current);

@@ -3,6 +3,7 @@ import {
   getCircle2DLayout,
   getCircle2DAutoplayStep,
   getCircle3DLayout,
+  getDragExpansionFactor,
   getGalleryAutoplayStep,
   getGalleryLayout,
   getHorizon3DLayout,
@@ -69,6 +70,29 @@ describe("getCircle2DLayout", () => {
 
     expect(Math.abs(mobile.x)).toBeLessThan(Math.abs(desktop.x));
     expect(mobile.scale).toBeLessThan(desktop.scale);
+  });
+});
+
+describe("getDragExpansionFactor", () => {
+  it("keeps layouts at their idle size when the gallery is not being dragged", () => {
+    expect(
+      getDragExpansionFactor({ dragging: false, reducedMotion: false, viewport: "desktop" })
+    ).toBe(1);
+  });
+
+  it("returns a subtle desktop expansion while dragging", () => {
+    expect(
+      getDragExpansionFactor({ dragging: true, reducedMotion: false, viewport: "desktop" })
+    ).toBeCloseTo(1.08, 3);
+  });
+
+  it("uses a calmer mobile expansion and disables the effect for reduced motion", () => {
+    expect(
+      getDragExpansionFactor({ dragging: true, reducedMotion: false, viewport: "mobile" })
+    ).toBeCloseTo(1.035, 3);
+    expect(
+      getDragExpansionFactor({ dragging: true, reducedMotion: true, viewport: "desktop" })
+    ).toBe(1);
   });
 });
 
@@ -149,6 +173,7 @@ describe("getGalleryLayout", () => {
   it("dispatches by layout mode without changing progress semantics", () => {
     const circle2d = getGalleryLayout({
       index: 3,
+      dragExpansion: 1,
       layoutMode: "circle2d",
       total: 30,
       progress: 1.25,
@@ -156,6 +181,7 @@ describe("getGalleryLayout", () => {
     });
     const circle3d = getGalleryLayout({
       index: 3,
+      dragExpansion: 1,
       layoutMode: "circle3d",
       total: 30,
       progress: 1.25,
@@ -163,6 +189,7 @@ describe("getGalleryLayout", () => {
     });
     const horizon3d = getGalleryLayout({
       index: 3,
+      dragExpansion: 1,
       layoutMode: "horizon3d",
       total: 30,
       progress: 1.25,
@@ -175,6 +202,64 @@ describe("getGalleryLayout", () => {
     expect(circle3d.x).not.toBeCloseTo(circle2d.x, 3);
     expect(circle3d.rotationY).not.toBe(0);
     expect(horizon3d.x).not.toBeCloseTo(circle2d.x, 3);
+  });
+
+  it("expands every layout without changing progress or image order semantics", () => {
+    const circle2dIdle = getGalleryLayout({
+      index: 4,
+      dragExpansion: 1,
+      layoutMode: "circle2d",
+      total: 30,
+      progress: 0.6,
+      viewport: "desktop"
+    });
+    const circle2dExpanded = getGalleryLayout({
+      index: 4,
+      dragExpansion: 1.08,
+      layoutMode: "circle2d",
+      total: 30,
+      progress: 0.6,
+      viewport: "desktop"
+    });
+    const circle3dIdle = getGalleryLayout({
+      index: 7,
+      dragExpansion: 1,
+      layoutMode: "circle3d",
+      total: 30,
+      progress: 0.6,
+      viewport: "desktop"
+    });
+    const circle3dExpanded = getGalleryLayout({
+      index: 7,
+      dragExpansion: 1.08,
+      layoutMode: "circle3d",
+      total: 30,
+      progress: 0.6,
+      viewport: "desktop"
+    });
+    const horizonIdle = getGalleryLayout({
+      index: 4,
+      dragExpansion: 1,
+      layoutMode: "horizon3d",
+      total: 30,
+      progress: 0.6,
+      viewport: "desktop"
+    });
+    const horizonExpanded = getGalleryLayout({
+      index: 4,
+      dragExpansion: 1.08,
+      layoutMode: "horizon3d",
+      total: 30,
+      progress: 0.6,
+      viewport: "desktop"
+    });
+
+    expect(Math.hypot(circle2dExpanded.x, circle2dExpanded.y)).toBeGreaterThan(
+      Math.hypot(circle2dIdle.x, circle2dIdle.y)
+    );
+    expect(Math.abs(circle3dExpanded.x)).toBeGreaterThan(Math.abs(circle3dIdle.x));
+    expect(Math.abs(horizonExpanded.x)).toBeGreaterThan(Math.abs(horizonIdle.x));
+    expect(horizonExpanded.layoutMode).toBe(horizonIdle.layoutMode);
   });
 });
 

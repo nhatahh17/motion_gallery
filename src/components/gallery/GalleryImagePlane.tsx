@@ -13,6 +13,7 @@ import { getGalleryPlaneSize } from "@/lib/gallery/plane";
 import { getRoundedPlaneShapePoints } from "@/lib/gallery/rounded-plane";
 
 type GalleryImagePlaneProps = {
+  dragExpansion: number;
   image: GalleryImage;
   index: number;
   layoutMode: GalleryLayoutMode;
@@ -24,6 +25,7 @@ type GalleryImagePlaneProps = {
 };
 
 export function GalleryImagePlane({
+  dragExpansion,
   image,
   index,
   layoutMode,
@@ -59,6 +61,7 @@ export function GalleryImagePlane({
   useFrame(() => {
     const placement = getGalleryLayout({
       index,
+      dragExpansion,
       layoutMode,
       total,
       progress: progressRef.current,

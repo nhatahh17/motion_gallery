@@ -19,6 +19,22 @@ export function getFocusedGalleryImage(images: GalleryImage[], progress: number)
   return images[index];
 }
 
+export function getAdjacentGalleryImageId(
+  images: GalleryImage[],
+  currentImageId: string,
+  direction: "next" | "previous"
+) {
+  const currentIndex = images.findIndex((image) => image.id === currentImageId);
+
+  if (currentIndex === -1) {
+    return null;
+  }
+
+  const offset = direction === "next" ? 1 : -1;
+  const nextIndex = (currentIndex + offset + images.length) % images.length;
+  return images[nextIndex]?.id ?? null;
+}
+
 export function isGalleryClick({
   startX,
   startY,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MutableRefObject } from "react";
+import type { MutableRefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { GalleryImage } from "@/lib/gallery/types";
 import { decayInertiaVelocity, shouldAutoplayAdvance } from "@/lib/gallery/interaction";
@@ -18,6 +18,7 @@ type GallerySceneProps = {
   modalOpenRef: MutableRefObject<boolean>;
   onSelectImage: (imageId: string) => void;
   progressRef: MutableRefObject<number>;
+  reducedMotion: boolean;
   resumeAutoplayAtRef: MutableRefObject<number>;
   velocityRef: MutableRefObject<number>;
 };
@@ -29,24 +30,11 @@ export function GalleryScene({
   modalOpenRef,
   onSelectImage,
   progressRef,
+  reducedMotion,
   resumeAutoplayAtRef,
   velocityRef
 }: GallerySceneProps) {
-  const [reducedMotion, setReducedMotion] = useState(false);
   const viewport = useThree((state) => getViewportMode(state.size.width));
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    function updateReducedMotion() {
-      setReducedMotion(media.matches);
-    }
-
-    updateReducedMotion();
-    media.addEventListener("change", updateReducedMotion);
-
-    return () => media.removeEventListener("change", updateReducedMotion);
-  }, []);
 
   useFrame((_, delta) => {
     if (modalOpenRef.current) {

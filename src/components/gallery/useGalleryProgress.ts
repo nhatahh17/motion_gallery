@@ -5,11 +5,12 @@ import type { PointerEvent } from "react";
 import {
   calculateDragVelocity,
   galleryDragConfig,
-  getDragProgressDelta
+  getDragProgressDelta,
+  getInertiaVelocityAfterDrag
 } from "@/lib/gallery/interaction";
 import type { GalleryViewportMode } from "@/lib/gallery/layout";
 
-export function useGalleryProgress(viewport: GalleryViewportMode) {
+export function useGalleryProgress(viewport: GalleryViewportMode, reducedMotion: boolean) {
   const progressRef = useRef(0);
   const velocityRef = useRef(0);
   const draggingRef = useRef(false);
@@ -65,15 +66,18 @@ export function useGalleryProgress(viewport: GalleryViewportMode) {
           const progressDelta = getDragProgressDelta({ deltaX, viewport });
 
           progressRef.current += progressDelta;
-          velocityRef.current = calculateDragVelocity({
-            elapsedMs: now - lastPointerRef.current.time,
-            progressDelta
+          velocityRef.current = getInertiaVelocityAfterDrag({
+            reducedMotion,
+            velocity: calculateDragVelocity({
+              elapsedMs: now - lastPointerRef.current.time,
+              progressDelta
+            })
           });
           lastPointerRef.current = { x: event.clientX, time: now };
         },
         onPointerUp: endDrag
       }
     }),
-    [endDrag, viewport]
+    [endDrag, reducedMotion, viewport]
   );
 }

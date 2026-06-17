@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getFocusedGalleryImage, getGalleryImageById, isGalleryClick } from "./detail";
+import {
+  getAdjacentGalleryImageId,
+  getFocusedGalleryImage,
+  getGalleryImageById,
+  isGalleryClick
+} from "./detail";
 import type { GalleryImage } from "./types";
 
 const images: GalleryImage[] = [
@@ -58,5 +63,18 @@ describe("isGalleryClick", () => {
 
   it("rejects larger movement so drags do not open the modal", () => {
     expect(isGalleryClick({ startX: 100, startY: 200, endX: 120, endY: 204 })).toBe(false);
+  });
+});
+
+describe("getAdjacentGalleryImageId", () => {
+  it("returns the next or previous image id from the current modal image", () => {
+    expect(getAdjacentGalleryImageId(images, "photo-001", "next")).toBe("photo-002");
+    expect(getAdjacentGalleryImageId(images, "photo-002", "previous")).toBe("photo-001");
+  });
+
+  it("wraps around the gallery and ignores missing selections", () => {
+    expect(getAdjacentGalleryImageId(images, "photo-002", "next")).toBe("photo-001");
+    expect(getAdjacentGalleryImageId(images, "photo-001", "previous")).toBe("photo-002");
+    expect(getAdjacentGalleryImageId(images, "missing", "next")).toBeNull();
   });
 });

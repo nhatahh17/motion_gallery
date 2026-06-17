@@ -52,6 +52,16 @@ export function decayInertiaVelocity(velocity: number) {
   return nextVelocity;
 }
 
+export function getInertiaVelocityAfterDrag({
+  reducedMotion,
+  velocity
+}: {
+  reducedMotion: boolean;
+  velocity: number;
+}) {
+  return reducedMotion ? 0 : velocity;
+}
+
 export function shouldAutoplayAdvance({
   dragging,
   nowMs,

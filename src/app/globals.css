@@ -236,6 +236,25 @@ select {
   cursor: pointer;
 }
 
+.gallery-detail-nav {
+  position: absolute;
+  z-index: 1;
+  right: 22px;
+  bottom: 22px;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.gallery-detail-nav-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(248, 248, 244, 0.86);
+  color: var(--text);
+  cursor: pointer;
+}
+
 .gallery-state {
   display: grid;
   width: min(1180px, 100%);
@@ -382,5 +401,11 @@ select {
 
   .gallery-detail-image {
     max-height: 48vh;
+  }
+
+  .gallery-detail-nav {
+    position: static;
+    justify-content: flex-end;
+    order: 3;
   }
 }

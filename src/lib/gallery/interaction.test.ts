@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   calculateDragVelocity,
   decayInertiaVelocity,
+  getInertiaVelocityAfterDrag,
   getDragProgressDelta,
   shouldAutoplayAdvance
 } from "./interaction";
@@ -38,6 +39,16 @@ describe("decayInertiaVelocity", () => {
 
   it("stops tiny residual velocity", () => {
     expect(decayInertiaVelocity(0.0003)).toBe(0);
+  });
+});
+
+describe("getInertiaVelocityAfterDrag", () => {
+  it("removes release inertia when reduced motion is active", () => {
+    expect(getInertiaVelocityAfterDrag({ reducedMotion: true, velocity: 0.06 })).toBe(0);
+  });
+
+  it("keeps clamped release inertia when motion is allowed", () => {
+    expect(getInertiaVelocityAfterDrag({ reducedMotion: false, velocity: 0.06 })).toBe(0.06);
   });
 });
 

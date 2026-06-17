@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import type { GalleryImage } from "@/lib/gallery/types";
-import { getFocusedGalleryImage, getGalleryImageById } from "@/lib/gallery/detail";
+import {
+  getAdjacentGalleryImageId,
+  getFocusedGalleryImage,
+  getGalleryImageById
+} from "@/lib/gallery/detail";
 import {
   getViewportMode,
   type GalleryLayoutMode,
@@ -20,10 +24,11 @@ type GalleryCanvasProps = {
 export function GalleryCanvas({ images }: GalleryCanvasProps) {
   const dpr = useViewportDpr();
   const [layoutMode, setLayoutMode] = useState<GalleryLayoutMode>("circle2d");
+  const [reducedMotion, setReducedMotion] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
-  const galleryProgress = useGalleryProgress(viewport);
+  const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
 
   const closeModal = useCallback(() => {
@@ -50,6 +55,34 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
     }
   }, [galleryProgress.progressRef, images, selectImage]);
 
+  const selectAdjacentImage = useCallback(
+    (direction: "next" | "previous") => {
+      if (!selectedImageId) {
+        return;
+      }
+
+      const nextImageId = getAdjacentGalleryImageId(images, selectedImageId, direction);
+
+      if (nextImageId) {
+        setSelectedImageId(nextImageId);
+      }
+    },
+    [images, selectedImageId]
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function updateReducedMotion() {
+      setReducedMotion(media.matches);
+    }
+
+    updateReducedMotion();
+    media.addEventListener("change", updateReducedMotion);
+
+    return () => media.removeEventListener("change", updateReducedMotion);
+  }, []);
+
   useEffect(() => {
     function updateViewport() {
       setViewport(getViewportMode(window.innerWidth));
@@ -63,15 +96,29 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape" && modalOpenRef.current) {
+      if (!modalOpenRef.current) {
+        return;
+      }
+
+      if (event.key === "Escape") {
         closeModal();
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        selectAdjacentImage("next");
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        selectAdjacentImage("previous");
       }
     }
 
     window.addEventListener("keydown", closeOnEscape);
 
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [closeModal]);
+  }, [closeModal, selectAdjacentImage]);
 
   return (
     <section
@@ -124,6 +171,7 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
           modalOpenRef={modalOpenRef}
           onSelectImage={selectImage}
           progressRef={galleryProgress.progressRef}
+          reducedMotion={reducedMotion}
           resumeAutoplayAtRef={galleryProgress.resumeAutoplayAtRef}
           velocityRef={galleryProgress.velocityRef}
         />
@@ -133,6 +181,7 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
           aria-modal="true"
           className="gallery-detail-backdrop"
           onClick={closeModal}
+          onPointerDown={(event) => event.stopPropagation()}
           role="dialog"
         >
           <article
@@ -148,6 +197,24 @@ export function GalleryCanvas({ images }: GalleryCanvasProps) {
             >
               Close
             </button>
+            <div className="gallery-detail-nav" aria-label="Image navigation">
+              <button
+                aria-label="Previous image"
+                className="gallery-detail-nav-button"
+                onClick={() => selectAdjacentImage("previous")}
+                type="button"
+              >
+                Previous
+              </button>
+              <button
+                aria-label="Next image"
+                className="gallery-detail-nav-button"
+                onClick={() => selectAdjacentImage("next")}
+                type="button"
+              >
+                Next
+              </button>
+            </div>
             <img
               alt={selectedImage.alt}
               className="gallery-detail-image"

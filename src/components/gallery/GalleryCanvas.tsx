@@ -54,6 +54,7 @@ export function GalleryCanvas({
   } | null>(null);
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
+  const cameraPointerRef = useRef({ x: 0, y: 0 });
   const shellPointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
@@ -77,6 +78,7 @@ export function GalleryCanvas({
     setSelectedImageId(null);
     onSelectedPhotoIdChange(null);
     modalOpenRef.current = false;
+    cameraPointerRef.current = { x: 0, y: 0 };
     galleryProgress.velocityRef.current = 0;
     galleryProgress.resumeAutoplayAtRef.current =
       window.performance.now() + 2200;
@@ -86,6 +88,7 @@ export function GalleryCanvas({
     setSelectedImageId(imageId);
     onSelectedPhotoIdChange(imageId);
     modalOpenRef.current = true;
+    cameraPointerRef.current = { x: 0, y: 0 };
     galleryProgress.draggingRef.current = false;
     galleryProgress.velocityRef.current = 0;
     galleryProgress.resumeAutoplayAtRef.current = Number.POSITIVE_INFINITY;
@@ -283,11 +286,17 @@ export function GalleryCanvas({
       }}
       onPointerLeave={(event) => {
         galleryProgress.bind.onPointerLeave(event);
+        cameraPointerRef.current = { x: 0, y: 0 };
         setCursorDragging(false);
         setHoveredImageId(null);
       }}
       onPointerMove={(event) => {
         galleryProgress.bind.onPointerMove(event);
+        const bounds = event.currentTarget.getBoundingClientRect();
+        cameraPointerRef.current = {
+          x: ((event.clientX - bounds.left) / bounds.width - 0.5) * 2,
+          y: ((event.clientY - bounds.top) / bounds.height - 0.5) * -2
+        };
         setCursorPoint({ x: event.clientX, y: event.clientY });
         setCursorDragging(galleryProgress.draggingRef.current);
         if (
@@ -363,6 +372,7 @@ export function GalleryCanvas({
         }}
       >
         <GalleryScene
+          cameraPointerRef={cameraPointerRef}
           draggingRef={galleryProgress.draggingRef}
           images={images}
           layoutMode={layoutMode}

@@ -38,6 +38,7 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-017 | Focused metadata preview | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified focused metadata preview appears, wheel-driven focus changes preview copy, preview hides while modal is open, preview returns after close, and 0 console errors. |
 | US-018 | Layout switcher pill animation | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified the active layout pill appears, moves after switching to `3D Horizon`, modal open/close still works, mobile has no horizontal overflow, and 0 console errors. |
 | US-019 | Drag orbit expansion | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified drag changes gallery rendering without opening the modal, `3D Horizon` switching, modal open/close, no horizontal overflow, and 0 console errors. |
+| US-020 | Camera breathing and pointer parallax | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified desktop pointer movement changes canvas rendering, `3D Horizon` switching, modal open/close, no horizontal overflow, and 0 console errors. |
 
 ## Evidence Rules
 

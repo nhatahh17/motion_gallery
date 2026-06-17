@@ -217,7 +217,7 @@ select {
   width: 100%;
   max-height: min(70vh, 560px);
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 10px;
   background: var(--bg);
 }
 

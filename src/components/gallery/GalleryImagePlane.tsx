@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { DoubleSide, LinearFilter, SRGBColorSpace, TextureLoader } from "three";
+import { DoubleSide, LinearFilter, Shape, SRGBColorSpace, TextureLoader } from "three";
 import type { Mesh, MeshBasicMaterial, Texture } from "three";
 import type { MutableRefObject } from "react";
 import type { GalleryImage } from "@/lib/gallery/types";
@@ -10,6 +10,7 @@ import type { GalleryLayoutMode, GalleryViewportMode } from "@/lib/gallery/layou
 import { isGalleryClick } from "@/lib/gallery/detail";
 import { getGalleryLayout } from "@/lib/gallery/layout";
 import { getGalleryPlaneSize } from "@/lib/gallery/plane";
+import { getRoundedPlaneShapePoints } from "@/lib/gallery/rounded-plane";
 
 type GalleryImagePlaneProps = {
   image: GalleryImage;
@@ -35,6 +36,21 @@ export function GalleryImagePlane({
   const [texture, setTexture] = useState<Texture | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const size = useMemo(() => getGalleryPlaneSize(image), [image]);
+  const roundedShape = useMemo(() => {
+    const points = getRoundedPlaneShapePoints({
+      width: size.width,
+      height: size.height,
+      radius: 0.12
+    });
+    const shape = new Shape();
+    const [firstPoint, ...remainingPoints] = points;
+
+    shape.moveTo(firstPoint.x, firstPoint.y);
+    remainingPoints.forEach((point) => shape.lineTo(point.x, point.y));
+    shape.closePath();
+
+    return shape;
+  }, [size.height, size.width]);
   const invalidate = useThree((state) => state.invalidate);
   const meshRef = useRef<Mesh | null>(null);
   const materialRef = useRef<MeshBasicMaterial | null>(null);
@@ -133,9 +149,13 @@ export function GalleryImagePlane({
         }
       }}
       ref={meshRef}
-      userData={{ galleryImageId: image.id, textureSource: image.thumbSrc }}
+      userData={{
+        galleryImageId: image.id,
+        roundedTreatment: "subtle",
+        textureSource: image.thumbSrc
+      }}
     >
-      <planeGeometry args={[size.width, size.height]} />
+      <shapeGeometry args={[roundedShape, 8]} />
       <meshBasicMaterial
         color={loadFailed ? image.dominantColor ?? "#d8d5c8" : "#ffffff"}
         ref={materialRef}

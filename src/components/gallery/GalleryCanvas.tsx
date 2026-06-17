@@ -6,6 +6,7 @@ import type { GalleryCategoryFilter } from "@/lib/gallery/category";
 import type { GalleryImage } from "@/lib/gallery/types";
 import {
   getAdjacentGalleryImageId,
+  getFocusedGalleryImagePreview,
   getFocusedGalleryImage,
   getGalleryImageById,
   getGalleryModalPreloadTargets
@@ -44,6 +45,11 @@ export function GalleryCanvas({
   const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
   const [cursorDragging, setCursorDragging] = useState(false);
   const [cursorPoint, setCursorPoint] = useState({ x: 0, y: 0 });
+  const [focusedPreview, setFocusedPreview] = useState<{
+    id: string;
+    title: string;
+    metadata: string;
+  } | null>(null);
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
@@ -170,6 +176,35 @@ export function GalleryCanvas({
 
     return () => window.removeEventListener("resize", updateViewport);
   }, []);
+
+  useEffect(() => {
+    let animationFrame = 0;
+    let lastPreviewId: string | null | undefined;
+    let lastSampleAt = 0;
+
+    function updateFocusedPreview(now: number) {
+      if (now - lastSampleAt >= 180) {
+        lastSampleAt = now;
+        const nextPreview = modalOpenRef.current
+          ? null
+          : getFocusedGalleryImagePreview(images, galleryProgress.progressRef.current);
+        const nextPreviewId = nextPreview?.id ?? null;
+
+        if (nextPreviewId !== lastPreviewId) {
+          lastPreviewId = nextPreviewId;
+          setFocusedPreview((currentPreview) =>
+            currentPreview?.id === nextPreviewId ? currentPreview : nextPreview
+          );
+        }
+      }
+
+      animationFrame = window.requestAnimationFrame(updateFocusedPreview);
+    }
+
+    animationFrame = window.requestAnimationFrame(updateFocusedPreview);
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [galleryProgress.progressRef, images]);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -307,6 +342,12 @@ export function GalleryCanvas({
           velocityRef={galleryProgress.velocityRef}
         />
       </Canvas>
+      {focusedPreview && !selectedImage ? (
+        <aside className="gallery-focus-preview" aria-live="polite">
+          <p className="gallery-focus-title">{focusedPreview.title}</p>
+          <p className="gallery-focus-meta">{focusedPreview.metadata}</p>
+        </aside>
+      ) : null}
       <div
         aria-hidden="true"
         className={`motion-cursor motion-cursor-${motionCursor.variant}`}

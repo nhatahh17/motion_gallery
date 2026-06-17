@@ -20,6 +20,20 @@ export function getFocusedGalleryImage(images: GalleryImage[], progress: number)
   return images[index];
 }
 
+export function getFocusedGalleryImagePreview(images: GalleryImage[], progress: number) {
+  const image = getFocusedGalleryImage(images, progress);
+
+  if (!image) {
+    return null;
+  }
+
+  return {
+    id: image.id,
+    title: image.title ?? image.alt,
+    metadata: `${image.location} / ${image.year} / ${image.category}`
+  };
+}
+
 export function getAdjacentGalleryImageId(
   images: GalleryImage[],
   currentImageId: string,

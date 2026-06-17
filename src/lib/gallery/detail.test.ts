@@ -3,6 +3,7 @@ import {
   buildGalleryPhotoHref,
   clearGalleryPhotoHref,
   getAdjacentGalleryImageId,
+  getFocusedGalleryImagePreview,
   getGalleryModalPreloadTargets,
   getFocusedGalleryImage,
   getGalleryImageById,
@@ -72,6 +73,28 @@ describe("getFocusedGalleryImage", () => {
   it("wraps progress through the available images", () => {
     expect(getFocusedGalleryImage(images, 2.2)?.id).toBe("photo-001");
     expect(getFocusedGalleryImage(images, -0.9)?.id).toBe("photo-002");
+  });
+});
+
+describe("getFocusedGalleryImagePreview", () => {
+  it("returns quiet preview copy for the image nearest the current progress", () => {
+    expect(getFocusedGalleryImagePreview(images, 0)).toEqual({
+      id: "photo-001",
+      title: "After Rain",
+      metadata: "Tokyo, Japan / 2026 / Street"
+    });
+  });
+
+  it("falls back to alt text and wraps progress through the image list", () => {
+    expect(getFocusedGalleryImagePreview(images, -0.9)).toEqual({
+      id: "photo-002",
+      title: "Soft morning light across a cafe window",
+      metadata: "Da Lat, Vietnam / 2025 / Daily"
+    });
+  });
+
+  it("returns null when no image can be focused", () => {
+    expect(getFocusedGalleryImagePreview([], 0)).toBeNull();
   });
 });
 

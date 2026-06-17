@@ -6,7 +6,7 @@ export default function Home() {
     <main className="page-shell">
       <header className="site-header">
         <p className="site-kicker">Personal Motion Gallery</p>
-        <p className="site-phase">Phase 15 / smooth modal preloading</p>
+        <p className="site-phase">Phase 16 / focused metadata preview</p>
       </header>
 
       <section className="intro-section" aria-labelledby="page-title">

@@ -19,6 +19,7 @@ import {
 } from "@/lib/gallery/layout";
 import { getMotionCursorState } from "@/lib/gallery/cursor";
 import { getLayoutSwitcherPillState } from "@/lib/gallery/switcher";
+import { getGalleryModalTransition } from "@/lib/gallery/modal-transition";
 import { GalleryScene } from "./GalleryScene";
 import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
@@ -71,6 +72,13 @@ export function GalleryCanvas({
     hoveredImageId,
     modalOpen: Boolean(selectedImage),
     reducedMotion,
+    viewport
+  });
+  const modalTransition = getGalleryModalTransition({
+    focusedImageId: focusedPreview?.id ?? null,
+    images,
+    reducedMotion,
+    selectedImageId,
     viewport
   });
 
@@ -415,6 +423,9 @@ export function GalleryCanvas({
           <article
             aria-label={selectedImage.title ?? selectedImage.alt}
             className="gallery-detail-modal"
+            data-transition={modalTransition.variant}
+            data-transition-enabled={modalTransition.enabled ? "true" : "false"}
+            style={modalTransition.style}
             onClick={(event) => event.stopPropagation()}
           >
             <button

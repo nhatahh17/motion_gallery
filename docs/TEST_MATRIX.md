@@ -43,6 +43,7 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-022 | Privacy safe gallery analytics hooks | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile/reduced-motion smoke verified Phase 22 label, local analytics events for load/layout/drag/open/close/reduced-motion, no horizontal overflow, and 0 console errors. |
 | US-023 | Gallery sort controls | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 23 label, sort controls, filter + sort composition, modal open/close, local `sort_changed` analytics event, no horizontal overflow, and 0 console errors. |
 | US-024 | Mobile swipe-down modal close | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 24 label, desktop modal close, mobile touch swipe-down close, sorting/layout controls, no horizontal overflow, and 0 console errors. |
+| US-025 | Lifecycle cleanup guard | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 25 label, invalid deep-link cleanup, filter/sort/layout controls, modal open/close, mobile no horizontal overflow, and 0 console errors. |
 
 ## Evidence Rules
 

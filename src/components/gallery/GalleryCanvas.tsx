@@ -25,6 +25,7 @@ import {
   dispatchGalleryAnalyticsEvent,
   shouldEmitReducedMotionAnalytics
 } from "@/lib/gallery/analytics";
+import { resetGalleryLifecycleRefs } from "@/lib/gallery/lifecycle";
 import { GalleryScene } from "./GalleryScene";
 import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
@@ -65,8 +66,10 @@ export function GalleryCanvas({
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
   const cameraPointerRef = useRef({ x: 0, y: 0 });
+  const cursorDraggingRef = useRef(false);
   const dragAnalyticsActiveRef = useRef(false);
   const reducedMotionAnalyticsEmittedRef = useRef(false);
+  const selectedImageIdRef = useRef<string | null>(null);
   const shellPointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const modalSwipeStartRef = useRef<{
     pointerType: string;
@@ -98,6 +101,36 @@ export function GalleryCanvas({
     viewport
   });
 
+  const resetLifecycleRefs = useCallback(
+    (options: { clearSelectedImage?: boolean; resumeDelayMs?: number } = {}) => {
+      resetGalleryLifecycleRefs(
+        {
+          cameraPointerRef,
+          cursorDraggingRef,
+          dragAnalyticsActiveRef,
+          draggingRef: galleryProgress.draggingRef,
+          modalOpenRef,
+          modalSwipeStartRef,
+          resumeAutoplayAtRef: galleryProgress.resumeAutoplayAtRef,
+          selectedImageIdRef,
+          shellPointerStartRef,
+          velocityRef: galleryProgress.velocityRef
+        },
+        {
+          clearSelectedImage: options.clearSelectedImage,
+          nowMs: window.performance.now(),
+          resumeDelayMs: options.resumeDelayMs ?? 2200
+        }
+      );
+      setCursorDragging(false);
+    },
+    [
+      galleryProgress.draggingRef,
+      galleryProgress.resumeAutoplayAtRef,
+      galleryProgress.velocityRef
+    ]
+  );
+
   const closeModal = useCallback(() => {
     if (selectedImage) {
       dispatchGalleryAnalyticsEvent(window, "image_closed", {
@@ -109,15 +142,10 @@ export function GalleryCanvas({
 
     setSelectedImageId(null);
     onSelectedPhotoIdChange(null);
-    modalOpenRef.current = false;
-    cameraPointerRef.current = { x: 0, y: 0 };
-    galleryProgress.velocityRef.current = 0;
-    galleryProgress.resumeAutoplayAtRef.current =
-      window.performance.now() + 2200;
+    resetLifecycleRefs();
   }, [
-    galleryProgress.resumeAutoplayAtRef,
-    galleryProgress.velocityRef,
     onSelectedPhotoIdChange,
+    resetLifecycleRefs,
     selectedImage
   ]);
 
@@ -133,6 +161,7 @@ export function GalleryCanvas({
     }
 
     setSelectedImageId(imageId);
+    selectedImageIdRef.current = imageId;
     onSelectedPhotoIdChange(imageId);
     modalOpenRef.current = true;
     cameraPointerRef.current = { x: 0, y: 0 };
@@ -181,18 +210,26 @@ export function GalleryCanvas({
   }, [layoutMode]);
 
   useEffect(() => {
+    selectedImageIdRef.current = selectedImageId;
+  }, [selectedImageId]);
+
+  useEffect(() => {
+    return () => resetLifecycleRefs({ clearSelectedImage: true, resumeDelayMs: 0 });
+  }, [resetLifecycleRefs]);
+
+  useEffect(() => {
     if (selectedImageId && !selectedImage) {
       setSelectedImageId(null);
-      modalOpenRef.current = false;
+      resetLifecycleRefs({ clearSelectedImage: true });
       onSelectedPhotoIdChange(null);
     }
-  }, [onSelectedPhotoIdChange, selectedImage, selectedImageId]);
+  }, [onSelectedPhotoIdChange, resetLifecycleRefs, selectedImage, selectedImageId]);
 
   useEffect(() => {
     if (!selectedPhotoId) {
       if (selectedImageId) {
         setSelectedImageId(null);
-        modalOpenRef.current = false;
+        resetLifecycleRefs({ clearSelectedImage: true });
       }
       return;
     }
@@ -206,6 +243,7 @@ export function GalleryCanvas({
 
     if (selectedPhotoId !== selectedImageId) {
       setSelectedImageId(selectedPhotoId);
+      selectedImageIdRef.current = selectedPhotoId;
       modalOpenRef.current = true;
       galleryProgress.draggingRef.current = false;
       galleryProgress.velocityRef.current = 0;
@@ -217,6 +255,7 @@ export function GalleryCanvas({
     galleryProgress.velocityRef,
     images,
     onSelectedPhotoIdChange,
+    resetLifecycleRefs,
     selectedImageId,
     selectedPhotoId
   ]);
@@ -353,6 +392,7 @@ export function GalleryCanvas({
       {...galleryProgress.bind}
       onPointerCancel={(event) => {
         galleryProgress.bind.onPointerCancel(event);
+        cursorDraggingRef.current = false;
         setCursorDragging(false);
         endDragAnalytics();
       }}
@@ -360,6 +400,7 @@ export function GalleryCanvas({
         shellPointerStartRef.current = { x: event.clientX, y: event.clientY };
         setCursorPoint({ x: event.clientX, y: event.clientY });
         galleryProgress.bind.onPointerDown(event);
+        cursorDraggingRef.current = galleryProgress.draggingRef.current;
         setCursorDragging(galleryProgress.draggingRef.current);
         if (galleryProgress.draggingRef.current && !dragAnalyticsActiveRef.current) {
           dragAnalyticsActiveRef.current = true;
@@ -371,6 +412,7 @@ export function GalleryCanvas({
       onPointerLeave={(event) => {
         galleryProgress.bind.onPointerLeave(event);
         cameraPointerRef.current = { x: 0, y: 0 };
+        cursorDraggingRef.current = false;
         setCursorDragging(false);
         setHoveredImageId(null);
         endDragAnalytics();
@@ -382,6 +424,7 @@ export function GalleryCanvas({
           x: ((event.clientX - bounds.left) / bounds.width - 0.5) * 2,
           y: ((event.clientY - bounds.top) / bounds.height - 0.5) * -2
         };
+        cursorDraggingRef.current = galleryProgress.draggingRef.current;
         setCursorPoint({ x: event.clientX, y: event.clientY });
         setCursorDragging(galleryProgress.draggingRef.current);
         if (
@@ -398,6 +441,7 @@ export function GalleryCanvas({
       }}
       onPointerUp={(event) => {
         galleryProgress.bind.onPointerUp(event);
+        cursorDraggingRef.current = false;
         setCursorDragging(false);
         endDragAnalytics();
       }}

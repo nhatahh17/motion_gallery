@@ -20,6 +20,10 @@ import {
 import { getMotionCursorState } from "@/lib/gallery/cursor";
 import { getLayoutSwitcherPillState } from "@/lib/gallery/switcher";
 import { getGalleryModalTransition } from "@/lib/gallery/modal-transition";
+import {
+  dispatchGalleryAnalyticsEvent,
+  shouldEmitReducedMotionAnalytics
+} from "@/lib/gallery/analytics";
 import { GalleryScene } from "./GalleryScene";
 import { useGalleryProgress } from "./useGalleryProgress";
 import { useViewportDpr } from "./useViewportDpr";
@@ -56,6 +60,8 @@ export function GalleryCanvas({
   const [viewport, setViewport] = useState<GalleryViewportMode>("desktop");
   const modalOpenRef = useRef(false);
   const cameraPointerRef = useRef({ x: 0, y: 0 });
+  const dragAnalyticsActiveRef = useRef(false);
+  const reducedMotionAnalyticsEmittedRef = useRef(false);
   const shellPointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
@@ -83,6 +89,14 @@ export function GalleryCanvas({
   });
 
   const closeModal = useCallback(() => {
+    if (selectedImage) {
+      dispatchGalleryAnalyticsEvent(window, "image_closed", {
+        category: selectedImage.category,
+        imageId: selectedImage.id,
+        title: selectedImage.title ?? selectedImage.alt
+      });
+    }
+
     setSelectedImageId(null);
     onSelectedPhotoIdChange(null);
     modalOpenRef.current = false;
@@ -90,9 +104,24 @@ export function GalleryCanvas({
     galleryProgress.velocityRef.current = 0;
     galleryProgress.resumeAutoplayAtRef.current =
       window.performance.now() + 2200;
-  }, [galleryProgress.resumeAutoplayAtRef, galleryProgress.velocityRef, onSelectedPhotoIdChange]);
+  }, [
+    galleryProgress.resumeAutoplayAtRef,
+    galleryProgress.velocityRef,
+    onSelectedPhotoIdChange,
+    selectedImage
+  ]);
 
   const selectImage = useCallback((imageId: string) => {
+    const nextImage = getGalleryImageById(images, imageId);
+
+    if (nextImage) {
+      dispatchGalleryAnalyticsEvent(window, "image_opened", {
+        category: nextImage.category,
+        imageId: nextImage.id,
+        title: nextImage.title ?? nextImage.alt
+      });
+    }
+
     setSelectedImageId(imageId);
     onSelectedPhotoIdChange(imageId);
     modalOpenRef.current = true;
@@ -104,6 +133,7 @@ export function GalleryCanvas({
     galleryProgress.draggingRef,
     galleryProgress.resumeAutoplayAtRef,
     galleryProgress.velocityRef,
+    images,
     onSelectedPhotoIdChange
   ]);
 
@@ -130,6 +160,15 @@ export function GalleryCanvas({
     },
     [images, onSelectedPhotoIdChange, selectedImageId]
   );
+
+  const endDragAnalytics = useCallback(() => {
+    if (dragAnalyticsActiveRef.current) {
+      dragAnalyticsActiveRef.current = false;
+      dispatchGalleryAnalyticsEvent(window, "drag_ended", {
+        layout: layoutMode
+      });
+    }
+  }, [layoutMode]);
 
   useEffect(() => {
     if (selectedImageId && !selectedImage) {
@@ -177,6 +216,16 @@ export function GalleryCanvas({
 
     function updateReducedMotion() {
       setReducedMotion(media.matches);
+
+      if (
+        shouldEmitReducedMotionAnalytics({
+          alreadyEmitted: reducedMotionAnalyticsEmittedRef.current,
+          reducedMotion: media.matches
+        })
+      ) {
+        reducedMotionAnalyticsEmittedRef.current = true;
+        dispatchGalleryAnalyticsEvent(window, "reduced_motion_enabled");
+      }
     }
 
     updateReducedMotion();
@@ -184,6 +233,14 @@ export function GalleryCanvas({
 
     return () => media.removeEventListener("change", updateReducedMotion);
   }, []);
+
+  useEffect(() => {
+    if (images.length > 0) {
+      dispatchGalleryAnalyticsEvent(window, "gallery_loaded", {
+        imageCount: images.length
+      });
+    }
+  }, [images.length]);
 
   useEffect(() => {
     function updateViewport() {
@@ -285,18 +342,26 @@ export function GalleryCanvas({
       onPointerCancel={(event) => {
         galleryProgress.bind.onPointerCancel(event);
         setCursorDragging(false);
+        endDragAnalytics();
       }}
       onPointerDown={(event) => {
         shellPointerStartRef.current = { x: event.clientX, y: event.clientY };
         setCursorPoint({ x: event.clientX, y: event.clientY });
         galleryProgress.bind.onPointerDown(event);
         setCursorDragging(galleryProgress.draggingRef.current);
+        if (galleryProgress.draggingRef.current && !dragAnalyticsActiveRef.current) {
+          dragAnalyticsActiveRef.current = true;
+          dispatchGalleryAnalyticsEvent(window, "drag_started", {
+            layout: layoutMode
+          });
+        }
       }}
       onPointerLeave={(event) => {
         galleryProgress.bind.onPointerLeave(event);
         cameraPointerRef.current = { x: 0, y: 0 };
         setCursorDragging(false);
         setHoveredImageId(null);
+        endDragAnalytics();
       }}
       onPointerMove={(event) => {
         galleryProgress.bind.onPointerMove(event);
@@ -320,6 +385,7 @@ export function GalleryCanvas({
       onPointerUp={(event) => {
         galleryProgress.bind.onPointerUp(event);
         setCursorDragging(false);
+        endDragAnalytics();
       }}
     >
       <div className="gallery-controls" onPointerDown={(event) => event.stopPropagation()}>
@@ -361,7 +427,12 @@ export function GalleryCanvas({
               aria-pressed={layoutMode === option.value}
               className="layout-switcher-button"
               key={option.value}
-              onClick={() => setLayoutMode(option.value)}
+              onClick={() => {
+                setLayoutMode(option.value);
+                dispatchGalleryAnalyticsEvent(window, "layout_changed", {
+                  layout: option.value
+                });
+              }}
               onPointerUp={(event) => event.stopPropagation()}
               type="button"
             >

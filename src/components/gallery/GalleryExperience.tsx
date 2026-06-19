@@ -57,18 +57,15 @@ export function GalleryExperience() {
   }
 
   return (
-    <>
-      <GalleryCanvas
-        categoryFilter={categoryFilter}
-        categoryOptions={categories}
-        images={visibleImages}
-        onCategoryFilterChange={setCategoryFilter}
-        onSelectedPhotoIdChange={updateSelectedPhotoId}
-        onSortModeChange={setSortMode}
-        selectedPhotoId={selectedPhotoId}
-        sortMode={sortMode}
-      />
-      <GalleryDebugList images={visibleImages} status="ready" />
-    </>
+    <GalleryCanvas
+      categoryFilter={categoryFilter}
+      categoryOptions={categories}
+      images={visibleImages}
+      onCategoryFilterChange={setCategoryFilter}
+      onSelectedPhotoIdChange={updateSelectedPhotoId}
+      onSortModeChange={setSortMode}
+      selectedPhotoId={selectedPhotoId}
+      sortMode={sortMode}
+    />
   );
 }

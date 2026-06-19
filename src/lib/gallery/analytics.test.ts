@@ -37,6 +37,13 @@ describe("buildGalleryAnalyticsEvent", () => {
     });
   });
 
+  it("keeps sort change details local and explicit", () => {
+    expect(buildGalleryAnalyticsEvent("sort_changed", { sort: "newest" }).detail).toEqual({
+      event: "sort_changed",
+      sort: "newest"
+    });
+  });
+
   it("supports the recommended MVP event vocabulary", () => {
     const events: GalleryAnalyticsEventName[] = [
       "gallery_loaded",
@@ -45,6 +52,7 @@ describe("buildGalleryAnalyticsEvent", () => {
       "image_closed",
       "drag_started",
       "drag_ended",
+      "sort_changed",
       "reduced_motion_enabled"
     ];
 

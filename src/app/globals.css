@@ -111,7 +111,8 @@ select {
 }
 
 .layout-switcher,
-.category-switcher {
+.category-switcher,
+.sort-switcher {
   display: inline-flex;
   gap: 4px;
   max-width: 100%;
@@ -147,7 +148,8 @@ select {
 }
 
 .layout-switcher-button,
-.category-switcher-button {
+.category-switcher-button,
+.sort-switcher-button {
   position: relative;
   z-index: 1;
   min-height: 32px;
@@ -163,11 +165,13 @@ select {
 }
 
 .layout-switcher-button[aria-pressed="true"],
-.category-switcher-button[aria-pressed="true"] {
+.category-switcher-button[aria-pressed="true"],
+.sort-switcher-button[aria-pressed="true"] {
   color: #fff;
 }
 
-.category-switcher-button[aria-pressed="true"] {
+.category-switcher-button[aria-pressed="true"],
+.sort-switcher-button[aria-pressed="true"] {
   background: rgba(16, 16, 16, 0.88);
 }
 
@@ -616,12 +620,14 @@ select {
   }
 
   .layout-switcher,
-  .category-switcher {
+  .category-switcher,
+  .sort-switcher {
     max-width: 100%;
   }
 
   .layout-switcher-button,
-  .category-switcher-button {
+  .category-switcher-button,
+  .sort-switcher-button {
     min-height: 30px;
     padding: 0 8px;
     font-size: 11px;

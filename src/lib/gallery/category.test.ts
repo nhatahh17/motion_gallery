@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   filterGalleryImagesByCategory,
   getGalleryCategories,
+  sortGalleryImages,
+  type GallerySortMode,
   type GalleryCategoryFilter
 } from "./category";
 import type { GalleryImage } from "./types";
@@ -34,9 +36,9 @@ const images: GalleryImage[] = [
     src: "/images/gallery/photo-003.png",
     thumbSrc: "/images/gallery/thumbs/photo-003.png",
     alt: "Another street frame",
-    location: "Tokyo, Japan",
+    location: "Seoul, South Korea",
     year: "2026",
-    category: "Street",
+    category: "Architecture",
     width: 1600,
     height: 1067
   }
@@ -44,7 +46,7 @@ const images: GalleryImage[] = [
 
 describe("getGalleryCategories", () => {
   it("returns stable unique categories in first-seen order", () => {
-    expect(getGalleryCategories(images)).toEqual(["Street", "Daily"]);
+    expect(getGalleryCategories(images)).toEqual(["Street", "Daily", "Architecture"]);
   });
 });
 
@@ -57,12 +59,45 @@ describe("filterGalleryImagesByCategory", () => {
 
   it("returns only images matching the selected category", () => {
     expect(filterGalleryImagesByCategory(images, "Street").map((image) => image.id)).toEqual([
-      "photo-001",
-      "photo-003"
+      "photo-001"
     ]);
   });
 
   it("returns an empty list for a category absent from the data", () => {
-    expect(filterGalleryImagesByCategory(images, "Architecture")).toEqual([]);
+    expect(filterGalleryImagesByCategory(images, "Nature")).toEqual([]);
+  });
+});
+
+describe("sortGalleryImages", () => {
+  it("keeps the source order for manual sorting", () => {
+    const mode: GallerySortMode = "manual";
+
+    expect(sortGalleryImages(images, mode).map((image) => image.id)).toEqual([
+      "photo-001",
+      "photo-002",
+      "photo-003"
+    ]);
+  });
+
+  it("sorts by newest year with stable title fallback", () => {
+    expect(sortGalleryImages(images, "newest").map((image) => image.id)).toEqual([
+      "photo-001",
+      "photo-003",
+      "photo-002"
+    ]);
+  });
+
+  it("sorts by location and category without mutating the source array", () => {
+    expect(sortGalleryImages(images, "location").map((image) => image.id)).toEqual([
+      "photo-002",
+      "photo-003",
+      "photo-001"
+    ]);
+    expect(sortGalleryImages(images, "category").map((image) => image.id)).toEqual([
+      "photo-003",
+      "photo-002",
+      "photo-001"
+    ]);
+    expect(images.map((image) => image.id)).toEqual(["photo-001", "photo-002", "photo-003"]);
   });
 });

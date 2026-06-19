@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Canvas } from "@react-three/fiber";
-import type { GalleryCategoryFilter } from "@/lib/gallery/category";
+import type { GalleryCategoryFilter, GallerySortMode } from "@/lib/gallery/category";
 import type { GalleryImage } from "@/lib/gallery/types";
 import {
   getAdjacentGalleryImageId,
@@ -34,7 +34,9 @@ type GalleryCanvasProps = {
   images: GalleryImage[];
   onCategoryFilterChange: (category: GalleryCategoryFilter) => void;
   onSelectedPhotoIdChange: (imageId: string | null) => void;
+  onSortModeChange: (sortMode: GallerySortMode) => void;
   selectedPhotoId: string | null;
+  sortMode: GallerySortMode;
 };
 
 export function GalleryCanvas({
@@ -43,7 +45,9 @@ export function GalleryCanvas({
   images,
   onCategoryFilterChange,
   onSelectedPhotoIdChange,
-  selectedPhotoId
+  onSortModeChange,
+  selectedPhotoId,
+  sortMode
 }: GalleryCanvasProps) {
   const dpr = useViewportDpr();
   const [layoutMode, setLayoutMode] = useState<GalleryLayoutMode>("circle2d");
@@ -316,7 +320,9 @@ export function GalleryCanvas({
         if (
           selectedImage ||
           (event.target instanceof Element &&
-            event.target.closest(".layout-switcher, .category-switcher, .gallery-detail-backdrop"))
+            event.target.closest(
+              ".layout-switcher, .category-switcher, .sort-switcher, .gallery-detail-backdrop"
+            ))
         ) {
           return;
         }
@@ -375,7 +381,9 @@ export function GalleryCanvas({
         if (
           !selectedImage &&
           event.target instanceof Element &&
-          !event.target.closest(".layout-switcher, .gallery-detail-backdrop")
+          !event.target.closest(
+            ".layout-switcher, .category-switcher, .sort-switcher, .gallery-detail-backdrop"
+          )
         ) {
           setHoveredImageId(
             getFocusedGalleryImage(images, galleryProgress.progressRef.current)?.id ?? null
@@ -409,6 +417,25 @@ export function GalleryCanvas({
               type="button"
             >
               {category}
+            </button>
+          ))}
+        </div>
+        <div className="sort-switcher" aria-label="Gallery sort">
+          {sortOptions.map((option) => (
+            <button
+              aria-pressed={sortMode === option.value}
+              className="sort-switcher-button"
+              key={option.value}
+              onClick={() => {
+                onSortModeChange(option.value);
+                dispatchGalleryAnalyticsEvent(window, "sort_changed", {
+                  sort: option.value
+                });
+              }}
+              onPointerUp={(event) => event.stopPropagation()}
+              type="button"
+            >
+              {option.label}
             </button>
           ))}
         </div>
@@ -569,4 +596,11 @@ const layoutOptions: Array<{ label: string; value: GalleryLayoutMode }> = [
   { label: "2D Circle", value: "circle2d" },
   { label: "3D Circle", value: "circle3d" },
   { label: "3D Horizon", value: "horizon3d" }
+];
+
+const sortOptions: Array<{ label: string; value: GallerySortMode }> = [
+  { label: "Manual", value: "manual" },
+  { label: "Newest", value: "newest" },
+  { label: "Location", value: "location" },
+  { label: "Category", value: "category" }
 ];

@@ -9,6 +9,7 @@ export type GalleryAnalyticsEventName =
   | "image_closed"
   | "drag_started"
   | "drag_ended"
+  | "sort_changed"
   | "reduced_motion_enabled";
 
 type GalleryAnalyticsInput = Record<string, unknown> & {
@@ -16,6 +17,7 @@ type GalleryAnalyticsInput = Record<string, unknown> & {
   imageCount?: unknown;
   imageId?: unknown;
   layout?: unknown;
+  sort?: unknown;
   title?: unknown;
 };
 
@@ -25,6 +27,7 @@ export type GalleryAnalyticsDetail = {
   imageCount?: number;
   imageId?: string;
   layout?: GalleryLayoutMode;
+  sort?: string;
   title?: string;
 };
 
@@ -48,6 +51,10 @@ export function buildGalleryAnalyticsEvent(
 
   if (isGalleryLayoutMode(input.layout)) {
     detail.layout = input.layout;
+  }
+
+  if (typeof input.sort === "string" && input.sort.trim()) {
+    detail.sort = input.sort;
   }
 
   if (typeof input.title === "string" && input.title.trim()) {

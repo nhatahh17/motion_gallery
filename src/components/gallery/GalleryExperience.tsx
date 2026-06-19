@@ -6,7 +6,9 @@ import { GalleryDebugList } from "@/components/GalleryDebugList";
 import {
   filterGalleryImagesByCategory,
   getGalleryCategories,
-  type GalleryCategoryFilter
+  sortGalleryImages,
+  type GalleryCategoryFilter,
+  type GallerySortMode
 } from "@/lib/gallery/category";
 import {
   buildGalleryPhotoHref,
@@ -22,6 +24,7 @@ export function GalleryExperience() {
   const searchParams = useSearchParams();
   const gallery = useGalleryData();
   const [categoryFilter, setCategoryFilter] = useState<GalleryCategoryFilter>("all");
+  const [sortMode, setSortMode] = useState<GallerySortMode>("manual");
   const selectedPhotoId = useMemo(
     () => getGalleryPhotoIdFromSearchParams(searchParams),
     [searchParams]
@@ -33,9 +36,9 @@ export function GalleryExperience() {
   const visibleImages = useMemo(
     () =>
       gallery.status === "ready"
-        ? filterGalleryImagesByCategory(gallery.images, categoryFilter)
+        ? sortGalleryImages(filterGalleryImagesByCategory(gallery.images, categoryFilter), sortMode)
         : [],
-    [categoryFilter, gallery]
+    [categoryFilter, gallery, sortMode]
   );
   const updateSelectedPhotoId = useCallback((imageId: string | null) => {
     const href = imageId
@@ -61,7 +64,9 @@ export function GalleryExperience() {
         images={visibleImages}
         onCategoryFilterChange={setCategoryFilter}
         onSelectedPhotoIdChange={updateSelectedPhotoId}
+        onSortModeChange={setSortMode}
         selectedPhotoId={selectedPhotoId}
+        sortMode={sortMode}
       />
       <GalleryDebugList images={visibleImages} status="ready" />
     </>

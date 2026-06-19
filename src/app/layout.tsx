@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, Geist_Mono } from "next/font/google";
 import { releaseMetadata } from "@/lib/gallery/release";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"]
+const displaySerif = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap"
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"]
+const sansGrotesk = Hanken_Grotesk({
+  variable: "--font-sans",
+  subsets: ["latin"],
+  display: "swap"
+});
+
+const monoFont = Geist_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  display: "swap"
 });
 
 export const metadata: Metadata = {
@@ -48,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${sansGrotesk.variable} ${displaySerif.variable} ${monoFont.variable}`}
     >
       <body>{children}</body>
     </html>

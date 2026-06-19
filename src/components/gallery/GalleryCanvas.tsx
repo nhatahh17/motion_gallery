@@ -20,6 +20,7 @@ import {
 import { getMotionCursorState } from "@/lib/gallery/cursor";
 import { getLayoutSwitcherPillState } from "@/lib/gallery/switcher";
 import { getGalleryModalTransition } from "@/lib/gallery/modal-transition";
+import { shouldCloseModalFromSwipe } from "@/lib/gallery/modal-gesture";
 import {
   dispatchGalleryAnalyticsEvent,
   shouldEmitReducedMotionAnalytics
@@ -67,6 +68,11 @@ export function GalleryCanvas({
   const dragAnalyticsActiveRef = useRef(false);
   const reducedMotionAnalyticsEmittedRef = useRef(false);
   const shellPointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const modalSwipeStartRef = useRef<{
+    pointerType: string;
+    x: number;
+    y: number;
+  } | null>(null);
   const galleryProgress = useGalleryProgress(viewport, reducedMotion);
   const selectedImage = getGalleryImageById(images, selectedImageId);
   const modalPreloadTargets = selectedImage
@@ -525,6 +531,34 @@ export function GalleryCanvas({
             data-transition-enabled={modalTransition.enabled ? "true" : "false"}
             style={modalTransition.style}
             onClick={(event) => event.stopPropagation()}
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              modalSwipeStartRef.current = {
+                pointerType: event.pointerType,
+                x: event.clientX,
+                y: event.clientY
+              };
+            }}
+            onPointerUp={(event) => {
+              event.stopPropagation();
+              const swipeStart = modalSwipeStartRef.current;
+              modalSwipeStartRef.current = null;
+
+              if (
+                swipeStart &&
+                shouldCloseModalFromSwipe({
+                  endX: event.clientX,
+                  endY: event.clientY,
+                  pointerType: swipeStart.pointerType,
+                  reducedMotion,
+                  startX: swipeStart.x,
+                  startY: swipeStart.y,
+                  viewport
+                })
+              ) {
+                closeModal();
+              }
+            }}
           >
             <button
               aria-label="Close image detail"

@@ -42,6 +42,7 @@ markdown file mirrors the current implemented story rows for quick review.
 | US-021 | WebGL-to-DOM transition hint | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 21 label, modal transition metadata, reduced-motion disablement, modal navigation, `3D Horizon` switching, no horizontal overflow, and 0 console errors. |
 | US-022 | Privacy safe gallery analytics hooks | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile/reduced-motion smoke verified Phase 22 label, local analytics events for load/layout/drag/open/close/reduced-motion, no horizontal overflow, and 0 console errors. |
 | US-023 | Gallery sort controls | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 23 label, sort controls, filter + sort composition, modal open/close, local `sort_changed` analytics event, no horizontal overflow, and 0 console errors. |
+| US-024 | Mobile swipe-down modal close | yes | no | yes | yes | implemented | `npm.cmd run test`; `npm.cmd run typecheck`; `npm.cmd run build`; Playwright fallback desktop/mobile smoke verified Phase 24 label, desktop modal close, mobile touch swipe-down close, sorting/layout controls, no horizontal overflow, and 0 console errors. |
 
 ## Evidence Rules
 

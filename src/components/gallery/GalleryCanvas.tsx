@@ -5,7 +5,6 @@ import { Canvas } from "@react-three/fiber";
 import type { GalleryCategoryFilter, GallerySortMode } from "@/lib/gallery/category";
 import type { GalleryImage } from "@/lib/gallery/types";
 import {
-  getAdjacentGalleryImageId,
   getFocusedGalleryImagePreview,
   getFocusedGalleryImage,
   getGalleryImageById,
@@ -142,7 +141,7 @@ export function GalleryCanvas({
 
     setSelectedImageId(null);
     onSelectedPhotoIdChange(null);
-    resetLifecycleRefs();
+    resetLifecycleRefs({ clearSelectedImage: true });
   }, [
     onSelectedPhotoIdChange,
     resetLifecycleRefs,
@@ -184,22 +183,6 @@ export function GalleryCanvas({
     }
   }, [galleryProgress.progressRef, images, selectImage]);
 
-  const selectAdjacentImage = useCallback(
-    (direction: "next" | "previous") => {
-      if (!selectedImageId) {
-        return;
-      }
-
-      const nextImageId = getAdjacentGalleryImageId(images, selectedImageId, direction);
-
-      if (nextImageId) {
-        setSelectedImageId(nextImageId);
-        onSelectedPhotoIdChange(nextImageId);
-      }
-    },
-    [images, onSelectedPhotoIdChange, selectedImageId]
-  );
-
   const endDragAnalytics = useCallback(() => {
     if (dragAnalyticsActiveRef.current) {
       dragAnalyticsActiveRef.current = false;
@@ -226,8 +209,12 @@ export function GalleryCanvas({
   }, [onSelectedPhotoIdChange, resetLifecycleRefs, selectedImage, selectedImageId]);
 
   useEffect(() => {
+    // Drive local modal state from the URL (deep links) without racing against
+    // closeModal: compare against the ref (kept in sync separately) and only
+    // react to selectedPhotoId changes, so a lagging URL never re-opens a modal
+    // we just closed.
     if (!selectedPhotoId) {
-      if (selectedImageId) {
+      if (selectedImageIdRef.current) {
         setSelectedImageId(null);
         resetLifecycleRefs({ clearSelectedImage: true });
       }
@@ -241,7 +228,7 @@ export function GalleryCanvas({
       return;
     }
 
-    if (selectedPhotoId !== selectedImageId) {
+    if (selectedPhotoId !== selectedImageIdRef.current) {
       setSelectedImageId(selectedPhotoId);
       selectedImageIdRef.current = selectedPhotoId;
       modalOpenRef.current = true;
@@ -256,7 +243,6 @@ export function GalleryCanvas({
     images,
     onSelectedPhotoIdChange,
     resetLifecycleRefs,
-    selectedImageId,
     selectedPhotoId
   ]);
 
@@ -339,23 +325,13 @@ export function GalleryCanvas({
 
       if (event.key === "Escape") {
         closeModal();
-        return;
-      }
-
-      if (event.key === "ArrowRight") {
-        selectAdjacentImage("next");
-        return;
-      }
-
-      if (event.key === "ArrowLeft") {
-        selectAdjacentImage("previous");
       }
     }
 
     window.addEventListener("keydown", closeOnEscape);
 
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [closeModal, selectAdjacentImage]);
+  }, [closeModal]);
 
   return (
     <section
@@ -612,24 +588,6 @@ export function GalleryCanvas({
             >
               Close
             </button>
-            <div className="gallery-detail-nav" aria-label="Image navigation">
-              <button
-                aria-label="Previous image"
-                className="gallery-detail-nav-button"
-                onClick={() => selectAdjacentImage("previous")}
-                type="button"
-              >
-                Previous
-              </button>
-              <button
-                aria-label="Next image"
-                className="gallery-detail-nav-button"
-                onClick={() => selectAdjacentImage("next")}
-                type="button"
-              >
-                Next
-              </button>
-            </div>
             <img
               alt={selectedImage.alt}
               className="gallery-detail-image"

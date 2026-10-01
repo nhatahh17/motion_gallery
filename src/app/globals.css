@@ -353,52 +353,53 @@ select {
   z-index: 5;
   inset: 0;
   display: grid;
-  padding: 24px;
-  place-items: center;
-  background: rgba(233, 230, 221, 0.62);
-  backdrop-filter: blur(22px) saturate(1.1);
+  padding: 0;
+  place-items: stretch;
+  background: rgba(26, 23, 17, 0.94);
   cursor: default;
   touch-action: auto;
-  animation: backdrop-in 320ms var(--ease-soft) both;
+  animation: backdrop-in 220ms var(--ease-soft) both;
 }
 
 .gallery-detail-modal {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
-  gap: 24px;
-  width: min(920px, 100%);
+  display: block;
+  width: 100%;
+  height: 100%;
   max-height: 100%;
-  padding: 16px;
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--panel-strong);
-  box-shadow: var(--shadow-modal);
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .gallery-detail-modal[data-transition-enabled="true"] {
-  animation: modal-connected-open 360ms var(--ease-out) both;
-  transform-origin: 50% 54%;
-}
-
-.gallery-detail-modal[data-transition="fallback"] {
-  animation-duration: 260ms;
+  animation: modal-connected-open 320ms var(--ease-out) both;
+  transform-origin: 50% 50%;
 }
 
 .gallery-detail-image {
   display: block;
   width: 100%;
-  max-height: min(72vh, 580px);
+  height: 100%;
+  max-height: 100%;
   object-fit: contain;
-  border-radius: var(--radius);
-  background: var(--bg-deep);
-  box-shadow: inset 0 0 0 1px rgba(22, 20, 15, 0.05);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .gallery-detail-copy {
-  align-self: end;
-  padding: 18px 14px 10px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 96px 32px 28px;
+  background: linear-gradient(to top, rgba(26, 23, 17, 0.82), rgba(26, 23, 17, 0));
+  color: #fbfaf6;
+  pointer-events: none;
 }
 
 .gallery-detail-kicker,
@@ -409,7 +410,7 @@ select {
 }
 
 .gallery-detail-kicker {
-  color: var(--muted);
+  color: rgba(251, 250, 246, 0.65);
   font-size: 11px;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
@@ -426,7 +427,7 @@ select {
 
 .gallery-detail-copy p:not(.gallery-detail-kicker) {
   margin-top: 12px;
-  color: var(--text-soft);
+  color: rgba(251, 250, 246, 0.82);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -435,14 +436,14 @@ select {
   display: grid;
   grid-template-columns: max-content 1fr;
   gap: 10px 18px;
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(251, 250, 246, 0.18);
   font-size: 13px;
 }
 
 .gallery-detail-copy dt {
-  color: var(--muted);
+  color: rgba(251, 250, 246, 0.6);
   font-size: 11px;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
@@ -450,17 +451,20 @@ select {
 
 .gallery-detail-copy dd {
   margin: 0;
-  color: var(--text-soft);
+  color: rgba(251, 250, 246, 0.82);
 }
 
-.gallery-detail-close,
-.gallery-detail-nav-button {
+.gallery-detail-close {
+  position: absolute;
+  z-index: 1;
+  top: 24px;
+  right: 24px;
   min-height: 34px;
   padding: 0 14px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(251, 250, 246, 0.28);
   border-radius: var(--radius-sm);
-  background: var(--panel);
-  color: var(--text);
+  background: rgba(26, 23, 17, 0.45);
+  color: #fbfaf6;
   cursor: pointer;
   font-size: 11px;
   font-weight: 500;
@@ -473,27 +477,10 @@ select {
     border-color 200ms var(--ease-soft);
 }
 
-.gallery-detail-close:hover,
-.gallery-detail-nav-button:hover {
-  background: var(--text);
-  border-color: var(--text);
-  color: #fbfaf6;
-}
-
-.gallery-detail-close {
-  position: absolute;
-  z-index: 1;
-  top: 24px;
-  right: 24px;
-}
-
-.gallery-detail-nav {
-  position: absolute;
-  z-index: 1;
-  right: 24px;
-  bottom: 24px;
-  display: inline-flex;
-  gap: 8px;
+.gallery-detail-close:hover {
+  background: #fbfaf6;
+  border-color: #fbfaf6;
+  color: var(--text);
 }
 
 .gallery-state {
@@ -891,30 +878,19 @@ select {
   }
 
   .gallery-detail-backdrop {
-    padding: 14px;
-  }
-
-  .gallery-detail-modal {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 12px;
+    padding: 0;
   }
 
   .gallery-detail-copy {
-    padding: 10px 4px 2px;
+    padding: 72px 18px 22px;
   }
 
   .gallery-detail-copy h2 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
-  .gallery-detail-image {
-    max-height: 48vh;
-  }
-
-  .gallery-detail-nav {
-    position: static;
-    justify-content: flex-end;
-    order: 3;
+  .gallery-detail-close {
+    top: 14px;
+    right: 14px;
   }
 }
